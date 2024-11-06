@@ -2,1080 +2,825 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Alzheimer's Patient Journey</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alzheimer's Disease Patient Flow with Leqembi Treatment</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-sankey/0.12.3/d3-sankey.min.js"></script>
     <style>
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: 'Segoe UI', system-ui, sans-serif;
-}
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
-body {
-    background: #f0f2f5;
-    color: #333;
-    padding: 2rem;
-}
+        :root {
+            --primary-color: #2D3748;
+            --secondary-color: #4A5568;
+            --accent-color: #3182CE;
+            --background-color: #F7FAFC;
+            --card-background: #FFFFFF;
+            --shadow-color: rgba(0, 0, 0, 0.1);
+        }
 
-.dashboard {
-    max-width: 1200px;
-    margin: 0 auto;
-    background: white;
-    border-radius: 1rem;
-    padding: 2rem;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    overflow-x: auto; 
-}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
+        }
 
-h1 {
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 2rem;
-}
+        body {
+            background-color: var(--background-color);
+            color: var(--primary-color);
+            line-height: 1.6;
+            padding: 2rem;
+        }
 
-.timeline {
-    position: relative;
-    margin: 2rem 0;
-    padding: 2rem 0;
-}
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            background-color: var(--card-background);
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px var(--shadow-color);
+        }
 
-.timeline::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 4px;
-    background: #e0e0e0;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 1;
-}
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding: 0 1rem;
+        }
 
-.stages {
-    display: flex;
-    justify-content: space-between;
-    position: relative;
-    z-index: 2;
-    align-items: center;
-}
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 1rem;
+            line-height: 1.2;
+        }
 
-.stage {
-    flex: 1;
-    margin: 0;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+        .description {
+            font-size: 1.125rem;
+            color: var(--secondary-color);
+            max-width: 800px;
+            margin: 0 auto;
+        }
 
-.stage-marker {
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: white;
-    border: 4px solid;
-    transition: all 0.3s ease;
-    position: relative;
-    margin-bottom: -4px;
-}
+        .visualization-container {
+            background: linear-gradient(to bottom, #ffffff, #f8fafc);
+            border-radius: 15px;
+            padding: 2rem;
+            margin-top: 2rem;
+            box-shadow: inset 0 2px 4px var(--shadow-color);
+        }
 
-.stage:nth-child(1) .stage-marker { 
-    width: 150px; 
-    height: 150px;
-    border-color: #3498db;
-}
-.stage:nth-child(2) .stage-marker { 
-    width: 120px; 
-    height: 120px;
-    border-color: #2ecc71;
-}
-.stage:nth-child(3) .stage-marker { 
-    width: 100px; 
-    height: 100px;
-    border-color: #f1c40f;
-}
-.stage:nth-child(4) .stage-marker { 
-    width: 75px; 
-    height: 75px;
-    border-color: #e67e22;
-}
-.stage:nth-child(5) .stage-marker { 
-    width: 60px; 
-    height: 60px;
-    border-color: #e74c3c;
-}
-.stage:nth-child(6) .stage-marker { 
-    width: 45px; 
-    height: 45px;
-    border-color: #9b59b6;
-}
+        #sankey {
+            width: 100%;
+            height: 600px;
+            margin: 0 auto;
+            overflow: visible;
+        }
 
-.stage:nth-child(1) .stage-marker span:first-child { font-size: 24px; }
-.stage:nth-child(2) .stage-marker span:first-child { font-size: 22px; }
-.stage:nth-child(3) .stage-marker span:first-child { font-size: 20px; }
-.stage:nth-child(4) .stage-marker span:first-child { font-size: 18px; }
-.stage:nth-child(5) .stage-marker span:first-child { font-size: 16px; }
-.stage:nth-child(6) .stage-marker span:first-child { font-size: 14px; }
+        .tooltip {
+            position: absolute;
+            padding: 12px 16px;
+            background: rgba(45, 55, 72, 0.95);
+            color: white;
+            border-radius: 8px;
+            pointer-events: none;
+            font-size: 0.875rem;
+            max-width: 300px;
+            z-index: 100;
+            visibility: hidden;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(4px);
+        }
 
-.population {
-    position: absolute;
-    top: -20px;
-    right: -20px;
-    background: #2c3e50;
-    color: white;
-    padding: 0.25rem 0.5rem;
-    border-radius: 1rem;
-    font-size: 0.8rem;
-}
+        .node {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
 
-.stage-title {
-    text-align: center;
-    margin-top: 1rem;
-    font-size: 0.9rem;
-    color: #666;
-    transition: all 0.3s ease;
-}
+        .node:hover {
+            opacity: 0.9;
+            filter: brightness(1.1);
+            transform: scale(1.02);
+        }
 
-.stage:hover .stage-marker {
-    transform: scale(1.1);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
+        .node-label {
+            font-weight: 600;
+            font-size: 0.875rem;
+            fill: var(--primary-color);
+            transition: all 0.2s ease;
+        }
 
-.stage:hover .stage-title {
-    color: #2c3e50;
-    font-weight: 500;
-}
-.stage-header h3 {
-    margin: 0;
-    font-size: 1.5rem;
-    color: white;
-}
+        .node:hover + .node-label {
+            font-weight: 700;
+            fill: var(--accent-color);
+        }
 
-.stage-details {
-    display: none;
-    background: #f8fafc;
-    border-radius: 1rem;
-    padding: 0;
-    margin-top: 2rem;
-}
-.stage-details.active {
-    display: block;
-    animation: slideDown 0.3s ease-out;
-}
+        .link {
+            fill: none;
+            stroke-opacity: 0.3;
+            transition: all 0.3s ease;
+        }
 
-.stage-header {
-    background: #2c3e50;
-    color: white;
-    padding: 1.5rem;
-    border-radius: 1rem 1rem 0 0;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        .link:hover {
+            stroke-opacity: 0.8;
+            stroke: var(--accent-color) !important;
+        }
 
-.stage-header h2 {
-    margin: 0;
-    font-size: 1.5rem;
-}
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
 
-.stage-stats {
-    display: flex;
-    gap: 1rem;
-    align-items: center;
-}
+            h1 {
+                font-size: 1.75rem;
+            }
 
-.stat-item {
-    background: rgba(255, 255, 255, 0.1);
-    padding: 0.5rem 1rem;
-    border-radius: 0.5rem;
-    font-size: 0.9rem;
-}
+            .description {
+                font-size: 1rem;
+            }
+        }
 
-.treatment-flow {
-    padding: 1.5rem;
-    background: white;
-    border-bottom: 1px solid #e5e7eb;
-}
+        .insight-panel {
+            display: none;
+            background: white;
+            border-radius: 12px;
+            margin-top: 2rem;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            opacity: 0;
+            transform: translateY(-20px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
 
-.treatment-flow h3 {
-    color: #2c3e50;
-    margin-bottom: 1rem;
-}
+        .insight-panel.active {
+            display: block;
+            opacity: 1;
+            transform: translateY(0);
+        }
 
-.flow-steps {
-    display: flex;
-    gap: 1rem;
-    overflow-x: auto;
-    padding-bottom: 1rem;
-}
+        .panel-header {
+            padding: 1rem 1.5rem;
+            font-weight: 600;
+            font-size: 1.25rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top-left-radius: 12px;
+            border-top-right-radius: 12px;
+        }
 
-.flow-step {
-    background: #f1f5f9;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    min-width: 200px;
-    position: relative;
-}
+        .insight-content {
+            padding: 1.5rem;
+            border-top: 1px solid #E2E8F0;
+        }
 
-.flow-step:not(:last-child)::after {
-    content: '→';
-    position: absolute;
-    right: -1rem;
-    top: 50%;
-    transform: translateY(-50%);
-    color: #64748b;
-}
+        .insight-category {
+            margin-bottom: 1.5rem;
+        }
 
-.insights-container {
-    display: flex;
-    min-height: 400px;
-}
+        .insight-category:last-child {
+            margin-bottom: 0;
+        }
 
-.categories-list {
-    width: 300px;
-    background: #f1f5f9;
-    padding: 1.5rem;
-}
+        .category-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #3182CE;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.25rem;
+            border-bottom: 2px solid #EDF2F7;
+        }
 
-.category-item {
-    padding: 1rem;
-    margin-bottom: 0.5rem;
-    border-radius: 0.5rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
+        .metric {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem;
+            background: #F7FAFC;
+            border-radius: 8px;
+            margin-bottom: 0.75rem;
+            transition: transform 0.2s ease;
+        }
 
-.category-item:hover {
-    background: #e2e8f0;
-}
+        .metric:hover {
+            transform: translateX(5px);
+            background: #EDF2F7;
+        }
 
-.category-item.active {
-    background: #2c3e50;
-    color: white;
-}
+        .metric-value {
+            font-weight: 700;
+            color: #2D3748;
+            font-size: 1.1rem;
+            min-width: 80px;
+        }
 
-.category-percent {
-    background: rgba(255, 255, 255, 0.2);
-    padding: 0.25rem 0.5rem;
-    border-radius: 1rem;
-    font-size: 0.8rem;
-}
+        .close-button {
+            cursor: pointer;
+            padding: 4px 8px;
+            border-radius: 4px;
+            background: rgba(255, 255, 255, 0.2);
+            transition: background 0.2s ease;
+        }
 
-.insights-content {
-    flex: 1;
-    padding: 1.5rem;
-    background: white;
-    display: none; /* Initially hidden */
-}
+        .close-button:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
 
-.insights-content.active {
-    display: block;
-}
-
-.empty-state {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100%;
-    color: #64748b;
-    padding: 2rem;
-    text-align: center;
-}
-
-.empty-state i {
-    font-size: 3rem;
-    margin-bottom: 1rem;
-    color: #94a3b8;
-}
-
-.insight-item {
-    margin-bottom: 1.5rem;
-    padding: 1rem;
-    border-radius: 0.5rem;
-    background: #f8fafc;
-    border-left: 4px solid #2c3e50;
-    animation: slideIn 0.3s ease-out;
-}
-
-.insight-item h4 {
-    color: #2c3e50;
-    margin-bottom: 0.5rem;
-}
-
-.insight-metrics {
-    display: flex;
-    gap: 1rem;
-    margin-top: 0.5rem;
-}
-
-.metric {
-    background: #e2e8f0;
-    padding: 0.25rem 0.5rem;
-    border-radius: 0.25rem;
-    font-size: 0.8rem;
-}
-
-@keyframes slideDown {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.key-metrics {
-    margin: 2rem 0;
-    padding: 0 1rem;
-    min-width: 1200px; /* Matches your dashboard max-width */
-    overflow-x: auto; /
-}
-
-.metrics-title {
-    text-align: center;
-    color: #2c3e50;
-    margin-bottom: 1.5rem;
-}
+        @media (max-width: 768px) {
+            .insight-panel {
+                margin: 1rem;
+            }
+            
+            .metric {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+            }
+            
+            .metric-value {
+                min-width: auto;
+            }
+        }
 
 .metrics-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr); /* Force 4 columns */
-    gap: 1rem; /* Reduced gap to fit better */
-    margin-bottom: 2rem;
-
+    display: flex;
+    margin: 2 2 2 2;
+    gap: 20px; 
+    flex-wrap: wrap;
+    padding: 20px;
 }
 
 .metric-card {
-    background: white;
-    border-radius: 1rem;
-    padding: 1.25rem; /* Slightly reduced padding */
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    min-width: 275px;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    width: 14%;
+    min-width: 250px; 
+    padding: 20px;
+    box-sizing: border-box;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* Card Hover Effect */
+.metric-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Card Header */
 .metric-header {
     display: flex;
     align-items: center;
-    margin-bottom: 1rem;
-    color: #2c3e50;
-}
-
-.metric-header i {
-    font-size: 1.5rem;
-    margin-right: 0.75rem;
-    color: #3498db;
+    gap: 10px;
+    margin-bottom: 15px;
 }
 
 .metric-header h3 {
-    margin: 0;
     font-size: 1.2rem;
+    color: #333;
 }
 
+/* Card Icons */
+.metric-header i {
+    font-size: 1.5rem;
+    color: #007bff;
+}
+
+/* Metric Content */
 .metric-content {
-    padding: 0.5rem 0;
+    font-size: 0.6rem;
+    color: #555;
 }
 
+/* Current Metric */
 .current-metric {
-    text-align: center;
-    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 10px;
 }
 
 .metric-value {
-    display: block;
-    font-size: 1.75rem;
+    font-size: 1.5rem;
     font-weight: bold;
-    color: #2c3e50;
-}
-
-.metric-label {
-    color: #666;
-    font-size: 0.9rem;
+    color: #333;
 }
 
 .projection {
-    text-align: center;
-    margin-bottom: 0.5rem;
+    margin-top: 10px;
 }
 
 .projection-value {
-    font-size: 1.25rem;
-    font-weight: bold;
-    color: #27ae60;
+    font-size: 1.2rem;
+    color: #888;
 }
 
 .growth-indicator {
-    text-align: center;
-    color: #27ae60;
-    font-size: 0.9rem;
-}
-
-.growth-indicator i {
-    margin-right: 0.25rem;
-}
-
-/* Treatment Split Styles */
-.treatment-split {
-    margin-top: 1rem;
-}
-
-.treatment-split h4 {
-    font-size: 0.9rem;
-    margin-bottom: 0.5rem;
-    color: #666;
-}
-
-.specialty-bar {
-    height: 2rem;
-    display: flex;
-    border-radius: 1rem;
-    overflow: hidden;
-}
-
-.specialty-segment {
     display: flex;
     align-items: center;
-    justify-content: center;
-    color: white;
-    font-size: 0.7rem;
-    padding: 0 0.5rem;
+    gap: 5px;
 }
 
-.specialty-segment.neuro {
-    background: #3498db;
+.growth-indicator.positive {
+    color: green;
 }
 
-.specialty-segment.geri {
-    background: #2ecc71;
+.growth-indicator.negative {
+    color: red;
 }
 
-.specialty-segment.pcp {
-    background: #e67e22;
-}
-
-/* Test Stats Styles */
-.test-stats {
-    padding: 0.5rem 0;
-}
-
-.test-type {
-    margin-bottom: 1rem;
-}
-
-.progress-bar {
-    height: 1rem;
-    background: #f0f2f5;
-    border-radius: 0.5rem;
-    margin-top: 0.25rem;
-    position: relative;
-}
-
-.progress {
-    height: 100%;
-    background: #3498db;
-    border-radius: 0.5rem;
-}
-
-.progress-bar span {
-    position: absolute;
-    right: 0.5rem;
-    top: 50%;
-    transform: translateY(-50%);
-    font-size: 0.8rem;
-    color: #666;
-}
-
-/* Adherence Chart Styles */
-.drug-class {
-    margin-bottom: 1rem;
-}
-
-.adherence-bar {
-    height: 1.5rem;
-    background: #f0f2f5;
-    border-radius: 0.75rem;
-    margin-top: 0.25rem;
-    overflow: hidden;
-}
-
-.adherence-level {
-    height: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
-    padding-right: 0.5rem;
-    color: white;
-    font-size: 0.8rem;
-}
-
-.adherence-level.high {
-    background: #2ecc71;
-}
-
-.adherence-level.medium {
-    background: #f1c40f;
-}
-
-.adherence-level.low {
-    background: #e67e22;
-}
-
+/* Treatment Stats */
 .treatment-stats {
-    margin-bottom: 1rem;
+    margin-bottom: 15px;
 }
 
 .stat-row {
     display: flex;
     justify-content: space-between;
-    margin-bottom: 0.5rem;
+    margin-bottom: 8px;
 }
 
 .stat-label {
-    color: #666;
+    font-size: 1rem;
+    color: #444;
 }
 
 .stat-value {
     font-weight: bold;
-    color: #2c3e50;
 }
 
+/* Specialty Bar */
+.specialty-bar {
+    display: flex;
+    margin-top: 15px;
+}
+
+.specialty-segment {
+    position: relative;
+    height: 30px;
+    border-radius: 5px;
+    margin-right: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    font-weight: bold;
+}
+
+.specialty-segment.neuro {
+    background-color: #007bff;
+}
+
+.specialty-segment.geri {
+    background-color: #28a745;
+}
+
+.specialty-segment.pcp {
+    background-color: #ff9900;
+}
+
+/* Progress Bars for Diagnostic Tests */
+.progress-bar {
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    position: relative;
+    height: 10px;
+    margin-top: 5px;
+}
+
+.progress {
+    background-color: #007bff;
+    height: 100%;
+    border-radius: 5px;
+}
+
+.test-type {
+    margin-bottom: 15px;
+}
+
+/* Treatment Adherence Bars */
+.adherence-bar {
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    position: relative;
+    height: 15px;
+    margin-top: 5px;
+}
+
+.adherence-level {
+    height: 100%;
+    border-radius: 5px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+}
+
+.adherence-level.high {
+    background-color: #28a745;
+}
+
+.adherence-level.medium {
+    background-color: #ffc107;
+}
+
+.adherence-level.low {
+    background-color: #dc3545;
+}
 
     </style>
 </head>
 <body>
-    <div class="dashboard">
-        <h1>Alzheimer's Patient Journey Timeline</h1>
-        <div class="key-metrics">
-            <div class="metrics-grid">
-                <!-- Diagnosis Rate Card -->
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <i class="fas fa-user-md"></i>
-                        <h3>Diagnosis Rate</h3>
-                    </div>
-                    <div class="metric-content">
-                        <div class="current-metric">
-                            <span class="metric-value">6.7M</span>
-                            <span class="metric-label">2024 Diagnosed Cases</span>
-                        </div>
-                        <div class="projection">
-                            <span class="projection-value">8.5M</span>
-                            <span class="projection-label">2030 Projection</span>
-                        </div>
-                        <div class="growth-indicator positive">
-                            <i class="fas fa-arrow-up"></i>
-                            <span>26.8% Growth</span>
-                        </div>
-                    </div>
-                </div>
-        
-                <!-- Treatment Rate Card -->
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <i class="fas fa-pills"></i>
-                        <h3>Treatment Rate</h3>
-                    </div>
-                    <div class="metric-content">
-                        <div class="treatment-stats">
-                            <div class="stat-row">
-                                <span class="stat-label">Currently Treated:</span>
-                                <span class="stat-value">62%</span>
-                            </div>
-                            <div class="stat-row">
-                                <span class="stat-label">Untreated:</span>
-                                <span class="stat-value">38%</span>
-                            </div>
-                        </div>
-                        <div class="treatment-split">
-                            <h4>Treatment by Specialty</h4>
-                            <div class="specialty-bar">
-                                <div class="specialty-segment neuro" style="width: 45%">
-                                    <span>Neurologists (45%)</span>
-                                </div>
-                                <div class="specialty-segment geri" style="width: 30%">
-                                    <span>Geriatrics (30%)</span>
-                                </div>
-                                <div class="specialty-segment pcp" style="width: 25%">
-                                    <span>PCPs (25%)</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-        
-                <!-- Diagnostic Tests Card -->
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <i class="fas fa-brain"></i>
-                        <h3>Diagnostic Tests</h3>
-                    </div>
-                    <div class="metric-content">
-                        <div class="test-stats">
-                            <div class="test-type">
-                                <span>MRI Scans</span>
-                                <div class="progress-bar">
-                                    <div class="progress" style="width: 75%"></div>
-                                    <span>75%</span>
-                                </div>
-                            </div>
-                            <div class="test-type">
-                                <span>PET Scans</span>
-                                <div class="progress-bar">
-                                    <div class="progress" style="width: 45%"></div>
-                                    <span>45%</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-        
-                <!-- Treatment Adherence Card -->
-                <div class="metric-card">
-                    <div class="metric-header">
-                        <i class="fas fa-chart-line"></i>
-                        <h3>Treatment Adherence</h3>
-                    </div>
-                    <div class="metric-content">
-                        <div class="adherence-chart">
-                            <div class="drug-class">
-                                <span>ChEI</span>
-                                <div class="adherence-bar">
-                                    <div class="adherence-level high" style="width: 82%">82%</div>
-                                </div>
-                            </div>
-                            <div class="drug-class">
-                                <span>NMDA</span>
-                                <div class="adherence-bar">
-                                    <div class="adherence-level medium" style="width: 75%">75%</div>
-                                </div>
-                            </div>
-                            <div class="drug-class">
-                                <span>Combination</span>
-                                <div class="adherence-bar">
-                                    <div class="adherence-level low" style="width: 68%">68%</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+    <div class="container">
+        <div class="header">
+            <h1>Alzheimer's Disease Patient Flow</h1>
         </div>
-        <div class="timeline">
-            <div class="stages">
-                <div class="stage" onclick="showDetails(1)">
-                    <div class="stage-marker">
-                        <span>1</span>
-                        <span class="population">100%</span>
-                    </div>
-                    <div class="stage-title">Early Symptom Onset</div>
+        <div class="visualization-container">
+            <div id="sankey"></div>
+            
+            <div class="insight-panel" id="earlyStagePanel">
+                <div class="panel-header" style="background-color: #48BB78; color: white; font-weight: bold; font-size: 20px;">
+                    Stage 1: Early Symptom Onset and Recognition
+                    <span class="arrow" style="font-size: 18px;">↓</span>
                 </div>
-                <div class="stage" onclick="showDetails(2)">
-                    <div class="stage-marker">
-                        <span>2</span>
-                        <span class="population">85%</span>
+                <div class="metrics-grid">
+                    <!-- Diagnosis Rate Card -->
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <i class="fas fa-user-md"></i>
+                            <h3>Diagnosis Rate</h3>
+                        </div>
+                        <div class="metric-content">
+                            <div class="current-metric">
+                                <span class="metric-value">100000</span>
+                                <span class="metric-label">2024 Diagnosed Cases</span>
+                            </div>
+                            <div class="growth-indicator positive">
+                                <i class="fas fa-arrow-up"></i>
+                                <span>26.8% Growth</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stage-title">Initial Evaluation</div>
-                </div>
-                <div class="stage" onclick="showDetails(3)">
-                    <div class="stage-marker">
-                        <span>3</span>
-                        <span class="population">70%</span>
+            
+                    <!-- Treatment Rate Card -->
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <i class="fas fa-pills"></i>
+                            <h3>Treatment Rate</h3>
+                        </div>
+                        <div class="metric-content">
+                            <div class="treatment-stats">
+                                <div class="stat-row">
+                                    <span class="stat-label">Currently Treated:</span>
+                                    <span class="stat-value">62%</span>
+                                </div>
+                                <div class="stat-row">
+                                    <span class="stat-label">Untreated:</span>
+                                    <span class="stat-value">38%</span>
+                                </div>
+                            </div>
+                            <div class="treatment-split">
+                                <h4>Treatment by Specialty</h4>
+                                <div class="specialty-bar">
+                                    <div class="specialty-segment neuro" style="width: 45%">
+                                        <span>Neurologists (45%)</span>
+                                    </div>
+                                    <div class="specialty-segment geri" style="width: 30%">
+                                        <span>Geriatrics (30%)</span>
+                                    </div>
+                                    <div class="specialty-segment pcp" style="width: 25%">
+                                        <span>PCPs (25%)</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stage-title">Early-Stage Care</div>
-                </div>
-                <div class="stage" onclick="showDetails(4)">
-                    <div class="stage-marker">
-                        <span>4</span>
-                        <span class="population">55%</span>
+            
+                    <!-- Diagnostic Tests Card -->
+                    <div class="metric-card">
+                        <div class="metric-header">
+                            <i class="fas fa-brain"></i>
+                            <h3>Diagnostic Tests</h3>
+                        </div>
+                        <div class="metric-content">
+                            <div class="test-stats">
+                                <div class="test-type">
+                                    <span>MRI Scans</span>
+                                    <div class="progress-bar">
+                                        <div class="progress" style="width: 75%"></div>
+                                        <span>75%</span>
+                                    </div>
+                                </div>
+                                <div class="test-type">
+                                    <span>PET Scans</span>
+                                    <div class="progress-bar">
+                                        <div class="progress" style="width: 45%"></div>
+                                        <span>45%</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="stage-title">Moderate Stage</div>
-                </div>
-                <div class="stage" onclick="showDetails(5)">
-                    <div class="stage-marker">
-                        <span>5</span>
-                        <span class="population">35%</span>
+            
+                    <!-- Treatment Adherence Card -->
+                    <!-- <div class="metric-card">
+                        <div class="metric-header">
+                            <i class="fas fa-chart-line"></i>
+                            <h3>Treatment Adherence</h3>
+                        </div>
+                        <div class="metric-content">
+                            <div class="adherence-chart">
+                                <div class="drug-class">
+                                    <span>ChEI</span>
+                                    <div class="adherence-bar">
+                                        <div class="adherence-level high" style="width: 82%">82%</div>
+                                    </div>
+                                </div>
+                                <div class="drug-class">
+                                    <span>NMDA</span>
+                                    <div class="adherence-bar">
+                                        <div class="adherence-level medium" style="width: 75%">75%</div>
+                                    </div>
+                                </div>
+                                <div class="drug-class">
+                                    <span>Combination</span>
+                                    <div class="adherence-bar">
+                                        <div class="adherence-level low" style="width: 68%">68%</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div> -->
+                <div class="insight-content" style="padding: 20px;">
+                    
+                    <!-- Physician Level Section -->
+                    <div class="insight-category" style="margin-bottom: 15px;">
+                        <div class="category-title" style="font-size: 18px; font-weight: bold; color: #333;">Physician Level</div>
+                        <div class="metric" style="margin-top: 10px;">
+                            <span class="metric-value" style="font-size: 24px; font-weight: bold;">65%</span>
+                            <span style="font-size: 16px;">of primary care physicians (PCPs) report difficulty in identifying early Alzheimer's Disease (AD) symptoms.</span>
+                        </div>
+                        <div class="metric" style="margin-top: 10px;">
+                            <span class="metric-value" style="font-size: 24px; font-weight: bold;">45%</span>
+                            <span style="font-size: 16px;">of PCPs delay referring patients to specialists at this stage due to lack of recognition of symptoms.</span>
+                        </div>
                     </div>
-                    <div class="stage-title">Severe Stage</div>
-                </div>
-                <div class="stage" onclick="showDetails(6)">
-                    <div class="stage-marker">
-                        <span>6</span>
-                        <span class="population">15%</span>
+                    
+                    <!-- Systematic Level Section -->
+                    <div class="insight-category" style="margin-bottom: 15px;">
+                        <div class="category-title" style="font-size: 18px; font-weight: bold; color: #333;">Systematic Level</div>
+                        <div class="metric" style="margin-top: 10px;">
+                            <span class="metric-value" style="font-size: 24px; font-weight: bold;">40%</span>
+                            <span style="font-size: 16px;">of insurance plans do not cover advanced diagnostic testing at the early stage of AD due to the lack of a confirmed diagnosis.</span>
+                        </div>
+                        <div class="metric" style="margin-top: 10px;">
+                            <span class="metric-value" style="font-size: 24px; font-weight: bold;">25%</span>
+                            <span style="font-size: 16px;">of healthcare systems lack sufficient resources to support the timely diagnosis of Alzheimer's at the early stage.</span>
+                        </div>
                     </div>
-                    <div class="stage-title">End-Stage Care</div>
+            
+                    <!-- Patient Characteristics Section -->
+                    <div class="insight-category" style="margin-bottom: 15px;">
+                        <div class="category-title" style="font-size: 18px; font-weight: bold; color: #333;">Patient Characteristics</div>
+                        <div class="metric" style="margin-top: 10px;">
+                            <span class="metric-value" style="font-size: 24px; font-weight: bold;">70%</span>
+                            <span style="font-size: 16px;">of patients at the early stage of Alzheimer's attribute symptoms to normal aging, leading to delays in seeking medical advice.</span>
+                        </div>
+                        <div class="metric" style="margin-top: 10px;">
+                            <span class="metric-value" style="font-size: 24px; font-weight: bold;">2.3 years</span>
+                            <span style="font-size: 16px;">is the average delay in seeking medical advice after noticing early cognitive symptoms.</span>
+                        </div>
+                    </div>
+            
+                   
                 </div>
             </div>
-        </div>
-        
-        <!-- Stage --1 -->
-        <div class="stage-details" id="stage1-details">
-            <div class="stage-header">
-                <h2>Early Symptom Onset and Recognition</h2>
-                <div class="stage-stats">
-                    <div class="stat-item">Current: 100%</div>
-                    <div class="stat-item">Reduction: 0%</div>
+            
+            <div class="insight-panel" id="evalStagePanel">
+                <div class="panel-header" style="background-color: #68D391; color: white;">
+                    Stage 2: Initial Evaluation
+                    <span class="close-button">✕</span>
                 </div>
-            </div>
-        
-            <div class="treatment-flow">
-                <h3>Treatment Flow</h3>
-                <div class="flow-steps">
-                    <div class="flow-step">
-                        <h4>Initial Assessment</h4>
-                        <p>Cognitive screening and family history evaluation</p>
-                    </div>
-                    <div class="flow-step">
-                        <h4>Risk Analysis</h4>
-                        <p>Evaluation of genetic and environmental factors</p>
-                    </div>
-                    <div class="flow-step">
-                        <h4>Early Intervention</h4>
-                        <p>Lifestyle modifications and monitoring</p>
-                    </div>
-                    <div class="flow-step">
-                        <h4>Support Planning</h4>
-                        <p>Family education and resource connection</p>
-                    </div>
-                </div>
-            </div>
-        
-            <div class="insights-container">
-                
-                <div class="categories-list">
-                    <h3>Touch points</h3>
-                    <br>
-                    <div class="category-item" data-category="healthcare">
-                        <span>Healthcare Access</span>
-                        <span class="category-percent">35%</span>
-                    </div>
-                    <div class="category-item" data-category="social">
-                        <span>Social Support</span>
-                        <span class="category-percent">25%</span>
-                    </div>
-                    <div class="category-item" data-category="education">
-                        <span>Education & Awareness</span>
-                        <span class="category-percent">20%</span>
-                    </div>
-                    <div class="category-item" data-category="economic">
-                        <span>Economic Factors</span>
-                        <span class="category-percent">20%</span>
-                    </div>
-                </div>
-        
-                <!-- Empty State -->
-                <div class="empty-state" id="empty-state">
-                    <i class="fas fa-chart-bar"></i>
-                    <h3>Select a Category</h3>
-                    <p>Choose a category from the left to view detailed insights</p>
-                </div>
-        
-                <!-- Healthcare Access Insights -->
-                <div class="insights-content" id="healthcare-insights-stage1">
-                    <div class="insight-item">
-                        <h4>Limited Access to Specialists</h4>
-                        <p>Shortage of neurologists and geriatric specialists in rural areas impacts timely diagnosis.</p>
-                        <div class="insight-metrics">
-                            <span class="metric">Impact: High</span>
-                            <span class="metric">Affected: 15%</span>
+                <div class="insight-content">
+                    <div class="insight-category">
+                        <div class="category-title">Diagnostic Process</div>
+                        <div class="metric">
+                            <span class="metric-value">75%</span>
+                            <span>of patients undergo cognitive assessment</span>
+                        </div>
+                        <div class="metric">
+                            <span class="metric-value">60%</span>
+                            <span>receive brain imaging studies</span>
                         </div>
                     </div>
-                    <div class="insight-item">
-                        <h4>Primary Care Availability</h4>
-                        <p>Restricted access to primary care physicians in underserved areas delays referrals.</p>
-                        <div class="insight-metrics">
-                            <span class="metric">Impact: Medium</span>
-                            <span class="metric">Affected: 12%</span>
+                    <div class="insight-category">
+                        <div class="category-title">Referral Patterns</div>
+                        <div class="metric">
+                            <span class="metric-value">85%</span>
+                            <span>of cases referred to specialists</span>
                         </div>
-                    </div>
-                </div>
-        
-                <!-- Social Support Insights -->
-                <div class="insights-content" id="social-insights-stage1">
-                    <div class="insight-item">
-                        <h4>Family Support Networks</h4>
-                        <p>Limited family awareness and support systems affect early detection.</p>
-                        <div class="insight-metrics">
-                            <span class="metric">Impact: High</span>
-                            <span class="metric">Affected: 13%</span>
-                        </div>
-                    </div>
-                    <div class="insight-item">
-                        <h4>Community Engagement</h4>
-                        <p>Lack of community resources and support groups.</p>
-                        <div class="insight-metrics">
-                            <span class="metric">Impact: Medium</span>
-                            <span class="metric">Affected: 12%</span>
-                        </div>
-                    </div>
-                </div>
-        
-                <!-- Education & Awareness Insights -->
-                <div class="insights-content" id="education-insights-stage1">
-                    <div class="insight-item">
-                        <h4>Public Awareness</h4>
-                        <p>Limited understanding of early symptoms and warning signs.</p>
-                        <div class="insight-metrics">
-                            <span class="metric">Impact: High</span>
-                            <span class="metric">Affected: 11%</span>
-                        </div>
-                    </div>
-                    <div class="insight-item">
-                        <h4>Healthcare Provider Education</h4>
-                        <p>Gaps in provider training for early detection.</p>
-                        <div class="insight-metrics">
-                            <span class="metric">Impact: Medium</span>
-                            <span class="metric">Affected: 9%</span>
-                        </div>
-                    </div>
-                </div>
-        
-                <!-- Economic Factors Insights -->
-                <div class="insights-content" id="economic-insights-stage1">
-                    <div class="insight-item">
-                        <h4>Healthcare Costs</h4>
-                        <p>Financial barriers to seeking early medical attention.</p>
-                        <div class="insight-metrics">
-                            <span class="metric">Impact: High</span>
-                            <span class="metric">Affected: 12%</span>
-                        </div>
-                    </div>
-                    <div class="insight-item">
-                        <h4>Insurance Coverage</h4>
-                        <p>Limited insurance coverage for preventive screenings.</p>
-                        <div class="insight-metrics">
-                            <span class="metric">Impact: Medium</span>
-                            <span class="metric">Affected: 8%</span>
+                        <div class="metric">
+                            <span class="metric-value">3.2 months</span>
+                            <span>average wait time for specialist appointment</span>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
-
-        <!-- Stage--2 -->
-        <div class="stage-details" id="stage2-details">
-            <div class="stage-header">
-                <h2>Initial Evaluation and Diagnosis
-                </h2>
-                <div class="stage-stats">
-                    <div class="stat-item">Current: 85%</div>
-                    <div class="stat-item">Reduction: -15%</div>
-                </div>
-            </div>
-        
-            <div class="treatment-flow">
-                <h3>Treatment Flow</h3>
-                <div class="flow-steps">
-                    <div class="flow-step">
-                        <h4>Comprehensive Cognitive Assessment</h4>
-                        <p>Detailed memory and cognitive testing to evaluate the level of impairment.</p>
-                    </div>
-                    <div class="flow-step">
-                        <h4>Neurological Examination</h4>
-                        <p>Assessment of neurological function, reflexes, and coordination.</p>
-                    </div>
-                    <div class="flow-step">
-                        <h4>Imaging and Biomarker Testing</h4>
-                        <p>Use of MRI or PET scans to detect amyloid plaques and other Alzheimer’s indicators.</p>
-                    </div>
-                    <div class="flow-step">
-                        <h4>Patient and Family Counseling</h4>
-                        <p>Discussion of diagnosis, potential treatments, and next steps with patient and family members.</p>
-                    </div>
-                </div>
-            </div>            
-            
-            <div class="insights-container">
-                <div class="categories-list">
-                    <h3>Touch points</h3>
-                    <br>
-                    <div class="category-item" data-category="healthcare">
-                        <span>Healthcare Access</span>
-                        <span class="category-percent">40%</span>
-                    </div>
-                    <div class="category-item" data-category="diagnostic">
-                        <span>Diagnostic Testing</span>
-                        <span class="category-percent">30%</span>
-                    </div>
-                    <div class="category-item" data-category="patient">
-                        <span>Patient Factors</span>
-                        <span class="category-percent">15%</span>
-                    </div>
-                    <div class="category-item" data-category="system">
-                        <span>Systemic Barriers</span>
-                        <span class="category-percent">15%</span>
-                    </div>
-                </div>
-            
-                <!-- Empty State -->
-                <div class="empty-state" id="empty-state">
-                    <i class="fas fa-chart-bar"></i>
-                    <h3>Select a Category</h3>
-                    <p>Choose a category from the left to view detailed insights</p>
-                </div>
-            
-                <!-- Healthcare Access Insights -->
-                <div class="insights-content" id="healthcare-insights-stage2">
-                    <div class="insight-item">
-                        <h4>Specialist Availability</h4>
-                        <p>Long wait times to see neurologists or specialists skilled in Alzheimer's diagnosis.</p>
-                        <div class="insight-metrics">
-                            <span class="metric">Impact: High</span>
-                            <span class="metric">Affected: 25%</span>
-                        </div>
-                    </div>
-                    <div class="insight-item">
-                        <h4>Referral Process</h4>
-                        <p>Complex or unclear referral pathways from primary care to specialists.</p>
-                        <div class="insight-metrics">
-                            <span class="metric">Impact: Medium</span>
-                            <span class="metric">Affected: 15%</span>
-                        </div>
-                    </div>
-                </div>
-            
-                <!-- Diagnostic Testing Insights -->
-                <div class="insights-content" id="diagnostic-insights-stage2">
-                    <div class="insight-item">
-                        <h4>Cost of Testing</h4>
-                        <p>High costs or lack of insurance coverage for diagnostic tests (e.g., PET scans, MRI).</p>
-                        <div class="insight-metrics">
-                            <span class="metric">Impact: High</span>
-                            <span class="metric">Affected: 18%</span>
-                        </div>
-                    </div>
-                    <div class="insight-item">
-                        <h4>Test Availability</h4>
-                        <p>Limited access to advanced diagnostic technologies in certain regions.</p>
-                        <div class="insight-metrics">
-                            <span class="metric">Impact: Medium</span>
-                            <span class="metric">Affected: 12%</span>
-                        </div>
-                    </div>
-                </div>
-            
-                <!-- Patient Factors Insights -->
-                <div class="insights-content" id="patient-insights-stage2">
-                    <div class="insight-item">
-                        <h4>Patient Denial/Minimization</h4>
-                        <p>Reluctance to acknowledge symptoms or seek medical help.</p>
-                        <div class="insight-metrics">
-                            <span class="metric">Impact: High</span>
-                            <span class="metric">Affected: 8%</span>
-                        </div>
-                    </div>
-                    <div class="insight-item">
-                        <h4>Comorbidities</h4>
-                        <p>Presence of other health conditions complicating diagnosis.</p>
-                        <div class="insight-metrics">
-                            <span class="metric">Impact: Medium</span>
-                            <span class="metric">Affected: 7%</span>
-                        </div>
-                    </div>
-                </div>
-            
-                <!-- Systemic Barriers Insights -->
-                <div class="insights-content" id="system-insights-stage2">
-                    <div class="insight-item">
-                        <h4>Data Interoperability</h4>
-                        <p>Challenges in sharing patient data between different healthcare providers.</p>
-                        <div class="insight-metrics">
-                            <span class="metric">Impact: Medium</span>
-                            <span class="metric">Affected: 8%</span>
-                        </div>
-                    </div>
-                    <div class="insight-item">
-                        <h4>Lack of Standardized Protocols</h4>
-                        <p>Variations in diagnostic approaches and criteria.</p>
-                        <div class="insight-metrics">
-                            <span class="metric">Impact: Medium</span>
-                            <span class="metric">Affected: 7%</span>
-                        </div>
-                    </div>
-                </div>
-            </div>       
+            <div class="tooltip" id="tooltip"></div>
         </div>
     </div>
+
     <script>
- // Updated JavaScript code
-function showDetails(stageNumber) {
-    // First, get the stage details element for the clicked stage
-    const stageDetails = document.getElementById(`stage${stageNumber}-details`);
-    
-    // Check if the clicked stage is already active
-    const isActive = stageDetails.classList.contains('active');
+        // Data for the Sankey diagram
+        const data = {
+            nodes: [
+                {id: "early", name: "Early Symptom Onset (100%)", color: "#48BB78"},
+                {id: "eval", name: "Initial Evaluation (85-90%)", color: "#68D391"},
+                {id: "init", name: "Treatment Initiation (70-75%)", color: "#4299E1"},
+                {id: "mod", name: "Moderate Stage (50-60%)", color: "#63B3ED"},
+                {id: "sev", name: "Severe Stage (30-40%)", color: "#7F9CF5"},
+                {id: "end", name: "End Stage (10-20%)", color: "#667EEA"}
+            ],
+            links: [
+                {source: 0, target: 1, value: 90},
+                {source: 1, target: 2, value: 75},
+                {source: 2, target: 3, value: 60},
+                {source: 3, target: 4, value: 40},
+                {source: 4, target: 5, value: 20}
+            ]
+        };
 
-    // Hide all stage details
-    document.querySelectorAll('.stage-details').forEach(detail => {
-        detail.classList.remove('active');
-    });
+// Set up the dimensions
+const margin = { top: 50, right: 200, bottom: 50, left: 200 };
+const width = 1700 - margin.left - margin.right;
+const height = 700 - margin.top - margin.bottom;
 
-    // If the clicked stage was not active, show it
-    if (!isActive) {
-        stageDetails.classList.add('active');
+// Create the SVG container
+const svg = d3.select("#sankey")
+  .append("svg")
+  .attr("width", "100%")
+  .attr("height", height + margin.top + margin.bottom)
+  .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
+  .append("g")
+  .attr("transform", `translate(${margin.left},${margin.top})`);
+
+// Create the Sankey generator
+const sankey = d3.sankey()
+  .nodeWidth(40)
+  .nodePadding(80)
+  .nodeAlign(d3.sankeyJustify)
+  .size([width, height]);
+
+// Generate the Sankey data
+const graph = sankey(data);
+
+// Create gradient definitions
+const defs = svg.append("defs");
+
+// Create the links with gradients
+const link = svg.append("g")
+  .selectAll(".link")
+  .data(graph.links)
+  .join("path")
+  .attr("class", "link")
+  .attr("d", d3.sankeyLinkHorizontal())
+  .style("stroke", d => {
+    const gradientId = `gradient-${d.index}`;
+    const gradient = defs.append("linearGradient")
+      .attr("id", gradientId)
+      .attr("gradientUnits", "userSpaceOnUse")
+      .attr("x1", d.source.x1)
+      .attr("x2", d.target.x0);
+
+    gradient.append("stop")
+      .attr("offset", "0%")
+      .attr("stop-color", d.source.color);
+
+    gradient.append("stop")
+      .attr("offset", "100%")
+      .attr("stop-color", d.target.color);
+
+    return `url(#${gradientId})`;
+  })
+  .style("stroke-width", d => Math.max(2, d.width))
+  .style("stroke-opacity", 0.6)
+  .on("mouseover", function (event, d) {
+    tooltip.style("visibility", "visible")
+      .html(`
+        <strong>${d.source.name}</strong> →<br>
+        <strong>${d.target.name}</strong><br>
+        Progression Rate: ${d.value}%`);
+    d3.select(this)
+      .style("stroke-opacity", 0.8)
+      .style("stroke-width", d => Math.max(3, d.width));
+  })
+  .on("mousemove", function (event) {
+    tooltip.style("top", (event.pageY + 10) + "px")
+      .style("left", (event.pageX + 10) + "px");
+  })
+  .on("mouseout", function () {
+    tooltip.style("visibility", "hidden");
+    d3.select(this)
+      .style("stroke-opacity", 0.6)
+      .style("stroke-width", d => Math.max(2, d.width));
+  });
+
+// Add the nodes
+const node = svg.append("g")
+  .selectAll(".node")
+  .data(graph.nodes)
+  .join("rect")
+  .attr("class", "node")
+  .attr("x", d => d.x0)
+  .attr("y", d => d.y0)
+  .attr("height", d => d.y1 - d.y0)
+  .attr("width", d => d.x1 - d.x0)
+  .style("fill", d => d.color)
+  .style("rx", 12)
+  .style("ry", 12)
+  .on("mouseover", function (event, d) {
+    tooltip.style("visibility", "visible")
+      .html(`
+        <strong>${d.name}</strong><br>
+        Patient Population: ${d.value.toFixed(1)}%`);
+  })
+  .on("mousemove", function (event) {
+    tooltip.style("top", (event.pageY + 10) + "px")
+      .style("left", (event.pageX + 10) + "px");
+  })
+  .on("mouseout", function () {
+    tooltip.style("visibility", "hidden");
+  });
+
+// Add the node labels
+svg.append("g")
+  .selectAll(".node-label")
+  .data(graph.nodes)
+  .join("text")
+  .attr("class", "node-label")
+  .attr("x", d => d.x0 - 16)
+  .attr("y", d => (d.y1 + d.y0) / 2)
+  .attr("dy", "0.35em")
+  .attr("text-anchor", "end")
+  .style("font-size", "16px")
+  .style("font-weight", "500")
+  .style("fill", "#4A5568")
+  .text(d => d.name)
+  .call(wrap, margin.left - 24);
+
+// Tooltip for showing details
+const tooltip = d3.select("#tooltip");
+
+// Text wrapping function
+function wrap(text, width) {
+  text.each(function () {
+    const text = d3.select(this);
+    const words = text.text().split(/\s+/).reverse();
+    let word;
+    let line = [];
+    let lineNumber = 0;
+    const lineHeight = 1.1;
+    const y = text.attr("y");
+    const dy = parseFloat(text.attr("dy"));
+    let tspan = text.text(null).append("tspan").attr("x", text.attr("x")).attr("y", y).attr("dy", dy + "em");
+
+    while (word = words.pop()) {
+      line.push(word);
+      tspan.text(line.join(" "));
+      if (tspan.node().getComputedTextLength() > width) {
+        line.pop();
+        tspan.text(line.join(" "));
+        line = [word];
+        tspan = text.append("tspan").attr("x", text.attr("x")).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+      }
     }
-
-    // Reset categories and show empty state when opening stage details
-    const currentStageCategories = document.querySelectorAll(`#stage${stageNumber}-details .category-item`);
-    currentStageCategories.forEach(item => {
-        item.classList.remove('active');
-    });
-    
-    // Show empty state and hide all insights for current stage
-    const currentEmptyState = document.querySelector(`#stage${stageNumber}-details .empty-state`);
-    const currentInsights = document.querySelectorAll(`#stage${stageNumber}-details .insights-content`);
-    
-    if (currentEmptyState) {
-        currentEmptyState.style.display = 'flex';
-    }
-    currentInsights.forEach(content => {
-        content.style.display = 'none';
-    });
+  });
 }
 
-// Update category click handlers
-document.addEventListener('DOMContentLoaded', function() {
-    document.querySelectorAll('.stage-details').forEach(stageDetail => {
-        const stageNumber = stageDetail.id.match(/\d+/)[0];
-        
-        stageDetail.querySelectorAll('.category-item').forEach(item => {
-            item.addEventListener('click', () => {
-                // Remove active class from all items in current stage
-                stageDetail.querySelectorAll('.category-item').forEach(i => {
-                    i.classList.remove('active');
-                });
-                
-                // Add active class to clicked item
-                item.classList.add('active');
-                
-                // Hide empty state for current stage
-                const emptyState = stageDetail.querySelector('.empty-state');
-                if (emptyState) {
-                    emptyState.style.display = 'none';
-                }
-                
-                // Hide all insight contents for current stage
-                stageDetail.querySelectorAll('.insights-content').forEach(content => {
-                    content.style.display = 'none';
-                });
-                
-                // Show selected category insights
-                const category = item.getAttribute('data-category');
-                const selectedInsights = stageDetail.querySelector(`#${category}-insights-stage${stageNumber}`);
-                if (selectedInsights) {
-                    selectedInsights.style.display = 'block';
-                }
+const handleNodeClick = (event, d) => {
+  // Hide all panels first
+  document.querySelectorAll('.insight-panel').forEach(panel => {
+    panel.classList.remove('active');
+  });
+
+  // Show the appropriate panel based on the clicked node
+  if (d.id === "early") {
+    document.getElementById('earlyStagePanel').classList.add('active');
+  } else if (d.id === "eval") {
+    document.getElementById('evalStagePanel').classList.add('active');
+  }
+};
+
+// Add this to your node selection
+node.on("click", handleNodeClick);
+
+        document.querySelectorAll('.close-button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                e.stopPropagation();
+                const panel = e.target.closest('.insight-panel');
+                panel.classList.remove('active');
             });
         });
-    });
-});
-    </script>
 
+    </script>
 </body>
 </html>
