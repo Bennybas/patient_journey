@@ -7,6 +7,7 @@
   <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
   <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
   <style>
     :root {
       --primary: #2563eb;
@@ -185,6 +186,7 @@
       box-shadow: var(--shadow);
       padding: 1.5rem;
       margin-bottom: 1.5rem;
+      margin-top: 30px;
     }
 
     .step-header {
@@ -241,20 +243,36 @@
     }
 
     .barriers-box {
-      background: var(--danger-light);
-      border-left: 4px solid var(--danger);
-      padding: 1rem;
-      margin: 1rem 0;
-      border-radius: 0 0.5rem 0.5rem 0;
-    }
+  background: #fee2e2;
+  border-left: 4px solid #ef4444;
+  padding: 16px;
+  margin: 12px 0;
+  border-radius: 0 8px 8px 0;
+}
 
-    .barriers-box h4 {
-      color: var(--danger);
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      margin-bottom: 0.5rem;
-    }
+.barriers-box h3 {
+  color: #b91c1c;
+  margin-bottom: 1rem;
+  display: flex;
+  align-items: center;
+}
+
+.barrier-category {
+  margin-top: 12px;
+}
+
+.barrier-category h4 {
+  font-size: 1rem;
+  color: #b91c1c;
+  margin: 8px 0;
+}
+
+.barrier-category ul {
+  list-style-type: disc;
+  padding-left: 20px;
+  color: #334155;
+}
+
 
     .next-step-button {
       width: 100%;
@@ -362,6 +380,78 @@ header {
       margin-bottom: 2rem;
       text-align: center;
     }
+    .info-section {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0;
+}
+
+.info-cards-container {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.info-card {
+  background-color: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  border: 1px solid #e2e8f0;
+  text-align: center;
+  width: 200px;
+  position: relative;
+}
+
+.info-card h4 {
+  font-size: 1.1rem;
+  color: #1e40af;
+  margin: 0;
+}
+
+.arrow-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.arrow-line {
+  width: 60px;
+  height: 2px;
+  background-color: #1e40af;
+  position: relative;
+}
+
+.arrow-line::after {
+  content: '';
+  width: 0; 
+  height: 0; 
+  border-left: 8px solid #1e40af;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  position: absolute;
+  right: -8px;
+  top: -3px;
+}
+
+.arrow-annotations {
+  text-align: center;
+  font-size: 0.7rem;
+  color: #334155;
+  font-weight: bold;
+}
+
+.annotation-top {
+  margin-bottom: 5px;
+}
+
+.annotation-bottom {
+  margin-top: 5px;
+  color: #6b7280;
+}
+h3{
+  font-weight: bold;
+}
 
  </style>
 </head>
@@ -408,7 +498,7 @@ header {
               </div>
             </div>
             <div class="stat-card">
-              <h3>58%</h3>
+              <h3>65%</h3>
               <p>Confirmed Diagnoses</p>
               <div class="progress-bar">
                 <div class="progress-fill" style="width: 58%"></div>
@@ -422,15 +512,57 @@ header {
             <div class="step-number">1</div>
             <h2 class="step-title">Primary Care Provider (PCP) Visit</h2>
           </div>
-          <p>Initial point of contact for all patients experiencing symptoms (100% of cases)</p>
+          
     
-          <div class="info-box">
-            <h4>Initial Diagnosis Statistics</h4>
-            <p><span class="stat">85%</span> of adults receive initial diagnosis through PCP</p>
-            <p><span class="stat">65%</span> of older adults face initial misdiagnosis</p>
-            <p><span class="stat">25%</span> of general population face initial misdiagnosis</p>
+          <div class="info-section">
+            <div class="info-cards-container">
+              <!-- First Card -->
+              <div class="info-card">
+                <h4>100% Patients Reached PCP</h4>
+              </div>
+          
+              <!-- Arrow with annotations -->
+              <div class="arrow-container">
+                <div class="annotation-top">-15% ,Recommended Further Tests</div>
+                <div class="arrow-line"></div>
+        
+                <div class="arrow-annotations">
+                  
+                  <div class="annotation-bottom">Timeline: 1-3 months</div>
+                </div>
+              </div>
+          
+              <!-- Second Card -->
+              <div class="info-card">
+                <h4>80% Patients Taken to Diagnosis</h4>
+              </div>
+            </div>
           </div>
-    
+          
+          <div class="barriers-box">
+            <h3><i class="fas fa-exclamation-triangle"></i> Key Barriers at PCP</h3>
+            
+            <!-- Physician Characteristics -->
+            <div class="barrier-category">
+              <h4>Physician Care Barriers</h4>
+              <ul>
+                <li>Misdiagnosis as age-related decline or depression, contributing to a <span class="stat">10%</span> reduction in diagnosis progression</li>
+                <li>Average time to correct diagnosis: <span class="stat">3-6 months</span></li>
+              </ul>
+            </div>
+            
+            <!-- Systematic Characteristics -->
+            <div class="barrier-category">
+              <h4>Systematic Barriers</h4>
+              <ul>
+                <li>Insurance plan restrictions affect <span class="stat">5%</span> of patients, delaying diagnosis progression</li>
+                <li>Referral delays: 1-3 months (general), 3-6 months (older adults)</li>
+              </ul>
+            </div>
+
+          </div>
+          
+          
           <button class="next-step-button" onclick="toggleDropdown(this)">
             Proceed to Cognitive Screening
             <i class="fas fa-chevron-down"></i>
@@ -443,19 +575,74 @@ header {
                 <h2 class="step-title">Cognitive Screening</h2>
               </div>
               
-              <div class="info-box">
-                <h4>Test Completion Rates</h4>
-                <p><span class="stat">78%</span> complete Mini-Mental State Exam (MMSE)</p>
-                <p><span class="stat">65%</span> complete Montreal Cognitive Assessment (MoCA)</p>
+              <div class="info-section">
+                <div class="info-cards-container">
+                  <!-- First Card -->
+                  <div class="info-card">
+                    <h4>85% Diagnosable Patients</h4>
+                  </div>
+              
+                  <!-- Arrow with annotations -->
+                  <div class="arrow-container">
+                    <div class="annotation-top">-5%,Additional cognitive tests</div>
+                    <div class="arrow-line"></div>
+            
+                    <div class="arrow-annotations">
+                      <div class="annotation-bottom">Timeline: 1 to 3 months</div>
+                    </div>
+                  </div>
+              
+                  <!-- Second Card -->
+                  <div class="info-card">
+                    <h4>80% Mini-Mental State Exam (MMSE)</h4>
+                  </div>
+
+                  <div class="arrow-container">
+                    <div class="annotation-top">-%2, Patient specific factors</div>
+                    <div class="arrow-line"></div>
+            
+                    <div class="arrow-annotations">
+                      
+                      <div class="annotation-bottom">Timeline: 1-2 weeks</div>
+                    </div>
+                  </div>
+
+                  <!-- Third card -->
+                  <div class="info-card">
+                    <h4>78% Montreal Cognitive Assessment (MoCA)</h4>
+                  </div>
+                </div>
               </div>
     
               <div class="barriers-box">
-                <h4><i class="fas fa-exclamation-triangle"></i> Common Testing Obstacles</h4>
-                <ul>
-                  <li>High testing costs</li>
-                  <li>Extended scheduling delays</li>
-                  <li>Limited availability of testing facilities</li>
-                </ul>
+                <h3><i class="fas fa-exclamation-triangle"></i> Key Barriers at Testing</h3>
+                
+                <!-- Physician Characteristics -->
+                <div class="barrier-category">
+                  <h4>Physician Care Barriers</h4>
+                  <ul>
+                    <li>Cognitive impairment confused with psychiatric disorders (e.g., depression), leading to inaccurate diagnosis and delay in appropriate treatment. <span class="stat">5%</span></li>
+                    
+                    <li>Average time to correct diagnosis: <span class="stat">3-6 months</span></li>
+                  </ul>
+                </div>
+                
+                <!-- Systematic Characteristics -->
+                <div class="barrier-category">
+                  <h4>Systematic Barriers</h4>
+                  <ul>
+                    <li>Insurance plan restrictions affect <span class="stat">1%</span> of patients, delaying diagnosis progression</li>
+                    <li>Referral delays: 1-3 months (general), 3-6 months (older adults)</li>
+                  </ul>
+                </div>
+                <div class="barrier-category">
+                  <h4>Patient Characteristics</h4>
+                  <ul>
+                    <li>Denial of Testing <span class="stat"> 1%</span> of patients, delaying diagnosis progression</li>
+                    
+                  </ul>
+                </div>
+    
               </div>
     
               <button class="next-step-button" onclick="toggleDropdown(this)">
@@ -470,34 +657,77 @@ header {
                     <h2 class="step-title">Neurologist Referral</h2>
                   </div>
     
-                  <div class="info-box">
-                    <h4>Confirmation Statistics</h4>
-                    <p><span class="stat">58%</span> receive confirmed Alzheimer's diagnosis</p>
-                    <p>Average time to confirmation: <span class="stat">3-6 months</span></p>
+                  <div class="info-section">
+                    <div class="info-cards-container">
+                      <!-- First Card -->
+                      <div class="info-card">
+                        <h4>78% Test Completion</h4>
+                      </div>
+                  
+                      <!-- Arrow with annotations -->
+                      <div class="arrow-container">
+                        <div class="annotation-top">-8% ,Referred to Neurologist</div>
+                        <div class="arrow-line"></div>
+                
+                        <div class="arrow-annotations">
+                          
+                          <div class="annotation-bottom">Timeline: 1-3 months</div>
+                        </div>
+                      </div>
+                  
+                      <!-- Second Card -->
+                      <div class="info-card">
+                        <h4>70% Referred to Neurologist</h4>
+                      </div>
+
+                      <div class="arrow-container">
+                        <div class="annotation-top">-%5, Confirmation</div>
+                        <div class="arrow-line"></div>
+                
+                        <div class="arrow-annotations">
+                          
+                          <div class="annotation-bottom">Timeline: 1-2 weeks</div>
+                        </div>
+                      </div>
+    
+                      <!-- Third card -->
+                      <div class="info-card">
+                        <h4>65% Confirmed Alzheimer's</h4>
+                      </div>
+                    </div>
+                    
+                  </div>
+                  <div class="barriers-box">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Key Barriers at Diagnosis</h3>
+                    
+
+                    
+                    <!-- Systematic Characteristics -->
+                    <div class="barrier-category">
+                      <h4>Systematic Barriers</h4>
+                      <ul>
+                        <li>Insurance plan restrictions affect <span class="stat">6%</span> of patients, delaying diagnosis progression</li>
+                        <li>Referral delays: 1-3 months (general), 3-6 months (older adults)</li>
+                      </ul>
+                    </div>
+                    <div class="barrier-category">
+                      <h4>Patient Characteristics</h4>
+                      <ul>
+                        <li>Patient not percistance <span class="stat"> 6%</span> delaying diagnosis progression</li>
+                        
+                      </ul>
+                    </div>
+        
+                  </div>
+                    </div>
                   </div>
     
-                  <div class="barriers-box">
-                    <h4><i class="fas fa-exclamation-triangle"></i> Key Referral Barriers</h4>
-                    <ul>
-                      <li>Insurance authorization delays</li>
-                      <li>Patient hesitation and denial</li>
-                      <li>Limited specialist availability</li>
-                      <li>Coordination between PCP and specialist</li>
-                    </ul>
-                  </div>
+          
                 </div>
               </div>
             </div>
           </div>
-          <div class="barriers-box">
-            <h4><i class="fas fa-exclamation-triangle"></i> Key Barriers at PCP Level</h4>
-            <ul>
-              <li>Insurance plan restrictions affect <span class="stat">15%</span> of patients</li>
-              <li>Referral delays: 1-3 months (general), 3-6 months (older adults)</li>
-              <li>Misdiagnosis as age-related decline or depression</li>
-              <li>Average time to correct diagnosis: <span class="stat">3-6 months</span></li>
-            </ul>
-          </div>
+          
         </div>
     
         </div>
