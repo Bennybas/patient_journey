@@ -1,826 +1,670 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Alzheimer's Disease Patient Flow with Leqembi Treatment</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-sankey/0.12.3/d3-sankey.min.js"></script>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Journey Visualization</title>
+  <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.16/dist/tailwind.min.css" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #2563eb;
+      --primary-light: #3b82f6;
+      --secondary: #64748b;
+      --background: #f8fafc;
+      --surface: #ffffff;
+      --text: #1e293b;
+      --text-light: #64748b;
+      --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+      --shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1);
+      --primary-dark: #1e40af;
+      --danger: #dc2626;
+      --danger-light: #fee2e2;
+      --gray-100: #f3f4f6;
+      --gray-200: #e5e7eb;
+      --gray-700: #374151;
+    }
 
-        :root {
-            --primary-color: #2D3748;
-            --secondary-color: #4A5568;
-            --accent-color: #3182CE;
-            --background-color: #F7FAFC;
-            --card-background: #FFFFFF;
-            --shadow-color: rgba(0, 0, 0, 0.1);
-        }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
 
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-        }
+    body {
+      font-family: system-ui, -apple-system, sans-serif;
+      background-color: var(--background);
+      color: var(--text);
+      line-height: 1.5;
+    }
 
-        body {
-            background-color: var(--background-color);
-            color: var(--primary-color);
-            line-height: 1.6;
-            padding: 2rem;
-        }
+    .container {
+      max-width: 1400px;
+      margin: 2rem auto;
+      padding: 0 1rem;
+    }
 
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            background-color: var(--card-background);
-            padding: 3rem;
-            border-radius: 20px;
-            box-shadow: 0 10px 25px var(--shadow-color);
-        }
+    .header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
 
-        .header {
-            text-align: center;
-            margin-bottom: 3rem;
-            padding: 0 1rem;
-        }
+    .header h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 1rem;
+    }
 
-        h1 {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 1rem;
-            line-height: 1.2;
-        }
+    .header p {
+      color: var(--text-light);
+      max-width: 600px;
+      margin: 0 auto;
+    }
 
-        .description {
-            font-size: 1.125rem;
-            color: var(--secondary-color);
-            max-width: 800px;
-            margin: 0 auto;
-        }
+    .visualization-container {
+      background-color: var(--surface);
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: var(--shadow-lg);
+      margin-bottom: 2rem;
+      
+    }
 
-        .visualization-container {
-            background: linear-gradient(to bottom, #ffffff, #f8fafc);
-            border-radius: 15px;
-            padding: 2rem;
-            margin-top: 2rem;
-            box-shadow: inset 0 2px 4px var(--shadow-color);
-        }
-
-        #sankey {
-            width: 100%;
-            height: 600px;
-            margin: 0 auto;
-            overflow: visible;
-        }
-
-        .tooltip {
-            position: absolute;
-            padding: 12px 16px;
-            background: rgba(45, 55, 72, 0.95);
-            color: white;
-            border-radius: 8px;
-            pointer-events: none;
-            font-size: 0.875rem;
-            max-width: 300px;
-            z-index: 100;
-            visibility: hidden;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            backdrop-filter: blur(4px);
-        }
-
-        .node {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-        }
-
-        .node:hover {
-            opacity: 0.9;
-            filter: brightness(1.1);
-            transform: scale(1.02);
-        }
-
-        .node-label {
-            font-weight: 600;
-            font-size: 0.875rem;
-            fill: var(--primary-color);
-            transition: all 0.2s ease;
-        }
-
-        .node:hover + .node-label {
-            font-weight: 700;
-            fill: var(--accent-color);
-        }
-
-        .link {
-            fill: none;
-            stroke-opacity: 0.3;
-            transition: all 0.3s ease;
-        }
-
-        .link:hover {
-            stroke-opacity: 0.8;
-            stroke: var(--accent-color) !important;
-        }
-
-        @media (max-width: 768px) {
-            .container {
-                padding: 1.5rem;
-            }
-
-            h1 {
-                font-size: 1.75rem;
-            }
-
-            .description {
-                font-size: 1rem;
-            }
-        }
-
-        .insight-panel {
-            display: none;
-            background: white;
-            border-radius: 12px;
-            margin-top: 2rem;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            opacity: 0;
-            transform: translateY(-20px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
-        }
-
-        .insight-panel.active {
-            display: block;
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        .panel-header {
-            padding: 1rem 1.5rem;
-            font-weight: 600;
-            font-size: 1.25rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-top-left-radius: 12px;
-            border-top-right-radius: 12px;
-        }
-
-        .insight-content {
-            padding: 1.5rem;
-            border-top: 1px solid #E2E8F0;
-        }
-
-        .insight-category {
-            margin-bottom: 1.5rem;
-        }
-
-        .insight-category:last-child {
-            margin-bottom: 0;
-        }
-
-        .category-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            color: #3182CE;
-            margin-bottom: 0.75rem;
-            padding-bottom: 0.25rem;
-            border-bottom: 2px solid #EDF2F7;
-        }
-
-        .metric {
-            display: flex;
-            align-items: center;
-            gap: 1rem;
-            padding: 1rem;
-            background: #F7FAFC;
-            border-radius: 8px;
-            margin-bottom: 0.75rem;
-            transition: transform 0.2s ease;
-        }
-
-        .metric:hover {
-            transform: translateX(5px);
-            background: #EDF2F7;
-        }
-
-        .metric-value {
-            font-weight: 700;
-            color: #2D3748;
-            font-size: 1.1rem;
-            min-width: 80px;
-        }
-
-        .close-button {
-            cursor: pointer;
-            padding: 4px 8px;
-            border-radius: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            transition: background 0.2s ease;
-        }
-
-        .close-button:hover {
-            background: rgba(255, 255, 255, 0.3);
-        }
-
-        @media (max-width: 768px) {
-            .insight-panel {
-                margin: 1rem;
-            }
-            
-            .metric {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 0.5rem;
-            }
-            
-            .metric-value {
-                min-width: auto;
-            }
-        }
-
-.metrics-grid {
-    display: flex;
-    margin: 2 2 2 2;
-    gap: 20px; 
-    flex-wrap: wrap;
-    padding: 20px;
+    #sankey_multiple {
+  width: 100%;
+  height: 500px;
+  display: block;
 }
 
-.metric-card {
-    background-color: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-    width: 14%;
-    min-width: 250px; 
-    padding: 20px;
-    box-sizing: border-box;
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
 
-/* Card Hover Effect */
-.metric-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-}
+    .stages-container {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: 2.5rem;
+    }
 
-/* Card Header */
-.metric-header {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 15px;
-}
+    .stage-card {
+      background-color: var(--surface);
+      border-radius: 1.75rem;
+      padding: 2rem;
+      box-shadow: var(--shadow);
+      transition: all 0.2s ease-in-out;
+      cursor: pointer;
+      position: relative;
+      width: 200px;
+      height: 120px;
+    }
 
-.metric-header h3 {
-    font-size: 1.2rem;
-    color: #333;
-}
+    .stage-card:hover {
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-lg);
+    }
 
-/* Card Icons */
-.metric-header i {
-    font-size: 1.5rem;
-    color: #007bff;
-}
+    .stage-card h3 {
+      font-size: 0.875rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
 
-/* Metric Content */
-.metric-content {
-    font-size: 0.6rem;
-    color: #555;
-}
+    .stage-insights {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: var(--surface);
+      border-radius: 1rem;
+      padding: 2rem;
+      box-shadow: var(--shadow-lg);
+      max-width: 600px;
+      width: 90%;
+      z-index: 100;
+      display: none;
+    }
 
-/* Current Metric */
-.current-metric {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-}
+    .stage-insights.active {
+      display: block;
+    }
 
-.metric-value {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: #333;
-}
+    .overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: rgba(0, 0, 0, 0.5);
+      z-index: 50;
+      display: none;
+    }
 
-.projection {
-    margin-top: 10px;
-}
+    .overlay.active {
+      display: block;
+    }
 
-.projection-value {
-    font-size: 1.2rem;
-    color: #888;
-}
+    .close-button {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--text-light);
+      padding: 0.5rem;
+      border-radius: 0.5rem;
+    }
+    li{
+      margin-left: 20px;
+    }
 
-.growth-indicator {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
+    .header-stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 1.5rem;
+      margin-top: 2rem;
+    }
 
-.growth-indicator.positive {
-    color: green;
-}
+    .stat-card {
+      background: var(--gray-100);
+      padding: 1.5rem;
+      border-radius: 0.75rem;
+      text-align: center;
+    }
 
-.growth-indicator.negative {
-    color: red;
-}
+    .stat-card h3 {
+      color: var(--primary-dark);
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
 
-/* Treatment Stats */
-.treatment-stats {
-    margin-bottom: 15px;
-}
+    .journey-section {
+      background: white;
+      border-radius: 1rem;
+      box-shadow: var(--shadow);
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
 
-.stat-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 8px;
-}
+    .step-header {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      margin-bottom: 1rem;
+    }
 
-.stat-label {
-    font-size: 1rem;
-    color: #444;
-}
+    .step-number {
+      background: var(--primary);
+      color: white;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.25rem;
+    }
 
-.stat-value {
-    font-weight: bold;
-}
+    .step-title {
+      color: var(--primary-dark);
+      font-size: 1.5rem;
+      margin: 0;
+    }
 
-/* Specialty Bar */
-.specialty-bar {
-    display: flex;
-    margin-top: 15px;
-}
+    .nested-section {
+      margin-left: 3rem;
+      border-left: 3px solid var(--primary);
+      padding-left: 1.5rem;
+      margin-top: 1rem;
+      position: relative;
+    }
 
-.specialty-segment {
-    position: relative;
-    height: 30px;
-    border-radius: 5px;
-    margin-right: 5px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    color: #fff;
-    font-weight: bold;
-}
+    .nested-section::before {
+      content: '';
+      position: absolute;
+      left: -3px;
+      top: 0;
+      width: 3px;
+      height: 100%;
+      background: var(--primary);
+      opacity: 0.3;
+    }
 
-.specialty-segment.neuro {
-    background-color: #007bff;
-}
+    .info-box {
+      background: var(--gray-100);
+      border-left: 4px solid var(--primary);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 0 0.5rem 0.5rem 0;
+    }
 
-.specialty-segment.geri {
-    background-color: #28a745;
-}
+    .barriers-box {
+      background: var(--danger-light);
+      border-left: 4px solid var(--danger);
+      padding: 1rem;
+      margin: 1rem 0;
+      border-radius: 0 0.5rem 0.5rem 0;
+    }
 
-.specialty-segment.pcp {
-    background-color: #ff9900;
-}
+    .barriers-box h4 {
+      color: var(--danger);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
 
-/* Progress Bars for Diagnostic Tests */
-.progress-bar {
-    background-color: #f0f0f0;
-    border-radius: 5px;
-    position: relative;
-    height: 10px;
-    margin-top: 5px;
-}
+    .next-step-button {
+      width: 100%;
+      padding: 1rem;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      margin: 1rem 0;
+      text-align: left;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
 
-.progress {
-    background-color: #007bff;
-    height: 100%;
-    border-radius: 5px;
-}
+    .next-step-button:hover {
+      background: #3400f1;
+      transform: translateY(-2px);
+    }
 
-.test-type {
-    margin-bottom: 15px;
-}
+    .dropdown-content {
+      display: none;
+      animation: slideDown 0.3s ease-out;
+    }
 
-/* Treatment Adherence Bars */
-.adherence-bar {
-    background-color: #f0f0f0;
-    border-radius: 5px;
-    position: relative;
-    height: 15px;
-    margin-top: 5px;
-}
-
-.adherence-level {
-    height: 100%;
-    border-radius: 5px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    color: white;
-    font-weight: bold;
-}
-
-.adherence-level.high {
-    background-color: #28a745;
-}
-
-.adherence-level.medium {
-    background-color: #ffc107;
-}
-
-.adherence-level.low {
-    background-color: #dc3545;
-}
-
-    </style>
-</head>
-<body>
-    <div class="container">
-        <div class="header">
-            <h1>Alzheimer's Disease Patient Flow</h1>
-        </div>
-        <div class="visualization-container">
-            <div id="sankey"></div>
-            
-            <div class="insight-panel" id="earlyStagePanel">
-                <div class="panel-header" style="background-color: #48BB78; color: white; font-weight: bold; font-size: 20px;">
-                    Stage 1: Early Symptom Onset and Recognition
-                    <span class="arrow" style="font-size: 18px;">↓</span>
-                </div>
-                <div class="metrics-grid">
-                    <!-- Diagnosis Rate Card -->
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <i class="fas fa-user-md"></i>
-                            <h3>Diagnosis Rate</h3>
-                        </div>
-                        <div class="metric-content">
-                            <div class="current-metric">
-                                <span class="metric-value">100000</span>
-                                <span class="metric-label">2024 Diagnosed Cases</span>
-                            </div>
-                            <div class="growth-indicator positive">
-                                <i class="fas fa-arrow-up"></i>
-                                <span>26.8% Growth</span>
-                            </div>
-                        </div>
-                    </div>
-            
-                    <!-- Treatment Rate Card -->
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <i class="fas fa-pills"></i>
-                            <h3>Treatment Rate</h3>
-                        </div>
-                        <div class="metric-content">
-                            <div class="treatment-stats">
-                                <div class="stat-row">
-                                    <span class="stat-label">Currently Treated:</span>
-                                    <span class="stat-value">62%</span>
-                                </div>
-                                <div class="stat-row">
-                                    <span class="stat-label">Untreated:</span>
-                                    <span class="stat-value">38%</span>
-                                </div>
-                            </div>
-                            <div class="treatment-split">
-                                <h4>Treatment by Specialty</h4>
-                                <div class="specialty-bar">
-                                    <div class="specialty-segment neuro" style="width: 45%">
-                                        <span>Neurologists (45%)</span>
-                                    </div>
-                                    <div class="specialty-segment geri" style="width: 30%">
-                                        <span>Geriatrics (30%)</span>
-                                    </div>
-                                    <div class="specialty-segment pcp" style="width: 25%">
-                                        <span>PCPs (25%)</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-            
-                    <!-- Diagnostic Tests Card -->
-                    <div class="metric-card">
-                        <div class="metric-header">
-                            <i class="fas fa-brain"></i>
-                            <h3>Diagnostic Tests</h3>
-                        </div>
-                        <div class="metric-content">
-                            <div class="test-stats">
-                                <div class="test-type">
-                                    <span>MRI Scans</span>
-                                    <div class="progress-bar">
-                                        <div class="progress" style="width: 75%"></div>
-                                        <span>75%</span>
-                                    </div>
-                                </div>
-                                <div class="test-type">
-                                    <span>PET Scans</span>
-                                    <div class="progress-bar">
-                                        <div class="progress" style="width: 45%"></div>
-                                        <span>45%</span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-            
-                    <!-- Treatment Adherence Card -->
-                    <!-- <div class="metric-card">
-                        <div class="metric-header">
-                            <i class="fas fa-chart-line"></i>
-                            <h3>Treatment Adherence</h3>
-                        </div>
-                        <div class="metric-content">
-                            <div class="adherence-chart">
-                                <div class="drug-class">
-                                    <span>ChEI</span>
-                                    <div class="adherence-bar">
-                                        <div class="adherence-level high" style="width: 82%">82%</div>
-                                    </div>
-                                </div>
-                                <div class="drug-class">
-                                    <span>NMDA</span>
-                                    <div class="adherence-bar">
-                                        <div class="adherence-level medium" style="width: 75%">75%</div>
-                                    </div>
-                                </div>
-                                <div class="drug-class">
-                                    <span>Combination</span>
-                                    <div class="adherence-bar">
-                                        <div class="adherence-level low" style="width: 68%">68%</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </div> -->
-                <div class="insight-content" style="padding: 20px;">
-                    
-                    <!-- Physician Level Section -->
-                    <div class="insight-category" style="margin-bottom: 15px;">
-                        <div class="category-title" style="font-size: 18px; font-weight: bold; color: #333;">Physician Level</div>
-                        <div class="metric" style="margin-top: 10px;">
-                            <span class="metric-value" style="font-size: 24px; font-weight: bold;">65%</span>
-                            <span style="font-size: 16px;">of primary care physicians (PCPs) report difficulty in identifying early Alzheimer's Disease (AD) symptoms.</span>
-                        </div>
-                        <div class="metric" style="margin-top: 10px;">
-                            <span class="metric-value" style="font-size: 24px; font-weight: bold;">45%</span>
-                            <span style="font-size: 16px;">of PCPs delay referring patients to specialists at this stage due to lack of recognition of symptoms.</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Systematic Level Section -->
-                    <div class="insight-category" style="margin-bottom: 15px;">
-                        <div class="category-title" style="font-size: 18px; font-weight: bold; color: #333;">Systematic Level</div>
-                        <div class="metric" style="margin-top: 10px;">
-                            <span class="metric-value" style="font-size: 24px; font-weight: bold;">40%</span>
-                            <span style="font-size: 16px;">of insurance plans do not cover advanced diagnostic testing at the early stage of AD due to the lack of a confirmed diagnosis.</span>
-                        </div>
-                        <div class="metric" style="margin-top: 10px;">
-                            <span class="metric-value" style="font-size: 24px; font-weight: bold;">25%</span>
-                            <span style="font-size: 16px;">of healthcare systems lack sufficient resources to support the timely diagnosis of Alzheimer's at the early stage.</span>
-                        </div>
-                    </div>
-            
-                    <!-- Patient Characteristics Section -->
-                    <div class="insight-category" style="margin-bottom: 15px;">
-                        <div class="category-title" style="font-size: 18px; font-weight: bold; color: #333;">Patient Characteristics</div>
-                        <div class="metric" style="margin-top: 10px;">
-                            <span class="metric-value" style="font-size: 24px; font-weight: bold;">70%</span>
-                            <span style="font-size: 16px;">of patients at the early stage of Alzheimer's attribute symptoms to normal aging, leading to delays in seeking medical advice.</span>
-                        </div>
-                        <div class="metric" style="margin-top: 10px;">
-                            <span class="metric-value" style="font-size: 24px; font-weight: bold;">2.3 years</span>
-                            <span style="font-size: 16px;">is the average delay in seeking medical advice after noticing early cognitive symptoms.</span>
-                        </div>
-                    </div>
-            
-                   
-                </div>
-            </div>
-            
-            <div class="insight-panel" id="evalStagePanel">
-                <div class="panel-header" style="background-color: #68D391; color: white;">
-                    Stage 2: Initial Evaluation
-                    <span class="close-button">✕</span>
-                </div>
-                <div class="insight-content">
-                    <div class="insight-category">
-                        <div class="category-title">Diagnostic Process</div>
-                        <div class="metric">
-                            <span class="metric-value">75%</span>
-                            <span>of patients undergo cognitive assessment</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value">60%</span>
-                            <span>receive brain imaging studies</span>
-                        </div>
-                    </div>
-                    <div class="insight-category">
-                        <div class="category-title">Referral Patterns</div>
-                        <div class="metric">
-                            <span class="metric-value">85%</span>
-                            <span>of cases referred to specialists</span>
-                        </div>
-                        <div class="metric">
-                            <span class="metric-value">3.2 months</span>
-                            <span>average wait time for specialist appointment</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="tooltip" id="tooltip"></div>
-        </div>
-    </div>
-
-    <script>
-        // Data for the Sankey diagram
-        const data = {
-            nodes: [
-                {id: "early", name: "Early Symptom Onset (100%)", color: "#48BB78"},
-                {id: "eval", name: "Initial Evaluation (85-90%)", color: "#68D391"},
-                {id: "init", name: "Treatment Initiation (70-75%)", color: "#4299E1"},
-                {id: "mod", name: "Moderate Stage (50-60%)", color: "#63B3ED"},
-                {id: "sev", name: "Severe Stage (30-40%)", color: "#7F9CF5"},
-                {id: "end", name: "End Stage (10-20%)", color: "#667EEA"}
-            ],
-            links: [
-                {source: 0, target: 1, value: 90},
-                {source: 1, target: 2, value: 75},
-                {source: 2, target: 3, value: 60},
-                {source: 3, target: 4, value: 40},
-                {source: 4, target: 5, value: 20}
-            ]
-        };
-
-// Set up the dimensions
-const margin = { top: 50, right: 200, bottom: 50, left: 200 };
-const width = 1700 - margin.left - margin.right;
-const height = 700 - margin.top - margin.bottom;
-
-// Create the SVG container
-const svg = d3.select("#sankey")
-  .append("svg")
-  .attr("width", "100%")
-  .attr("height", height + margin.top + margin.bottom)
-  .attr("viewBox", `0 0 ${width + margin.left + margin.right} ${height + margin.top + margin.bottom}`)
-  .append("g")
-  .attr("transform", `translate(${margin.left},${margin.top})`);
-
-// Create the Sankey generator
-const sankey = d3.sankey()
-  .nodeWidth(40)
-  .nodePadding(80)
-  .nodeAlign(d3.sankeyJustify)
-  .size([width, height]);
-
-// Generate the Sankey data
-const graph = sankey(data);
-
-// Create gradient definitions
-const defs = svg.append("defs");
-
-// Create the links with gradients
-const link = svg.append("g")
-  .selectAll(".link")
-  .data(graph.links)
-  .join("path")
-  .attr("class", "link")
-  .attr("d", d3.sankeyLinkHorizontal())
-  .style("stroke", d => {
-    const gradientId = `gradient-${d.index}`;
-    const gradient = defs.append("linearGradient")
-      .attr("id", gradientId)
-      .attr("gradientUnits", "userSpaceOnUse")
-      .attr("x1", d.source.x1)
-      .attr("x2", d.target.x0);
-
-    gradient.append("stop")
-      .attr("offset", "0%")
-      .attr("stop-color", d.source.color);
-
-    gradient.append("stop")
-      .attr("offset", "100%")
-      .attr("stop-color", d.target.color);
-
-    return `url(#${gradientId})`;
-  })
-  .style("stroke-width", d => Math.max(2, d.width))
-  .style("stroke-opacity", 0.6)
-  .on("mouseover", function (event, d) {
-    tooltip.style("visibility", "visible")
-      .html(`
-        <strong>${d.source.name}</strong> →<br>
-        <strong>${d.target.name}</strong><br>
-        Progression Rate: ${d.value}%`);
-    d3.select(this)
-      .style("stroke-opacity", 0.8)
-      .style("stroke-width", d => Math.max(3, d.width));
-  })
-  .on("mousemove", function (event) {
-    tooltip.style("top", (event.pageY + 10) + "px")
-      .style("left", (event.pageX + 10) + "px");
-  })
-  .on("mouseout", function () {
-    tooltip.style("visibility", "hidden");
-    d3.select(this)
-      .style("stroke-opacity", 0.6)
-      .style("stroke-width", d => Math.max(2, d.width));
-  });
-
-// Add the nodes
-const node = svg.append("g")
-  .selectAll(".node")
-  .data(graph.nodes)
-  .join("rect")
-  .attr("class", "node")
-  .attr("x", d => d.x0)
-  .attr("y", d => d.y0)
-  .attr("height", d => d.y1 - d.y0)
-  .attr("width", d => d.x1 - d.x0)
-  .style("fill", d => d.color)
-  .style("rx", 12)
-  .style("ry", 12)
-  .on("mouseover", function (event, d) {
-    tooltip.style("visibility", "visible")
-      .html(`
-        <strong>${d.name}</strong><br>
-        Patient Population: ${d.value.toFixed(1)}%`);
-  })
-  .on("mousemove", function (event) {
-    tooltip.style("top", (event.pageY + 10) + "px")
-      .style("left", (event.pageX + 10) + "px");
-  })
-  .on("mouseout", function () {
-    tooltip.style("visibility", "hidden");
-  });
-
-// Add the node labels
-svg.append("g")
-  .selectAll(".node-label")
-  .data(graph.nodes)
-  .join("text")
-  .attr("class", "node-label")
-  .attr("x", d => d.x0 - 16)
-  .attr("y", d => (d.y1 + d.y0) / 2)
-  .attr("dy", "0.35em")
-  .attr("text-anchor", "end")
-  .style("font-size", "16px")
-  .style("font-weight", "500")
-  .style("fill", "#4A5568")
-  .text(d => d.name)
-  .call(wrap, margin.left - 24);
-
-// Tooltip for showing details
-const tooltip = d3.select("#tooltip");
-
-// Text wrapping function
-function wrap(text, width) {
-  text.each(function () {
-    const text = d3.select(this);
-    const words = text.text().split(/\s+/).reverse();
-    let word;
-    let line = [];
-    let lineNumber = 0;
-    const lineHeight = 1.1;
-    const y = text.attr("y");
-    const dy = parseFloat(text.attr("dy"));
-    let tspan = text.text(null).append("tspan").attr("x", text.attr("x")).attr("y", y).attr("dy", dy + "em");
-
-    while (word = words.pop()) {
-      line.push(word);
-      tspan.text(line.join(" "));
-      if (tspan.node().getComputedTextLength() > width) {
-        line.pop();
-        tspan.text(line.join(" "));
-        line = [word];
-        tspan = text.append("tspan").attr("x", text.attr("x")).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
     }
-  });
+
+    .stat {
+      color: var(--primary-dark);
+      font-weight: bold;
+    }
+
+    .progress-bar {
+      background: var(--gray-200);
+      height: 0.5rem;
+      border-radius: 1rem;
+      margin: 1rem 0;
+      overflow: hidden;
+    }
+
+    .progress-fill {
+      height: 100%;
+      background: var(--primary);
+      border-radius: 1rem;
+      transition: width 1s ease-in-out;
+    }
+
+    .update-time {
+      text-align: center;
+      color: var(--gray-700);
+      font-size: 0.875rem;
+      margin-top: 2rem;
+    }
+
+    @media (max-width: 1200px) {
+  .stages-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
-const handleNodeClick = (event, d) => {
-  // Hide all panels first
-  document.querySelectorAll('.insight-panel').forEach(panel => {
-    panel.classList.remove('active');
-  });
-
-  // Show the appropriate panel based on the clicked node
-  if (d.id === "early") {
-    document.getElementById('earlyStagePanel').classList.add('active');
-  } else if (d.id === "eval") {
-    document.getElementById('evalStagePanel').classList.add('active');
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
   }
-};
+  
+  .header-stats {
+    grid-template-columns: 1fr;
+  }
 
-// Add this to your node selection
-node.on("click", handleNodeClick);
+  .nested-section {
+    margin-left: 1.5rem;
+  }
 
-        document.querySelectorAll('.close-button').forEach(button => {
-            button.addEventListener('click', (e) => {
-                e.stopPropagation();
-                const panel = e.target.closest('.insight-panel');
-                panel.classList.remove('active');
-            });
-        });
+  .stages-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
 
-    </script>
+@media (max-width: 480px) {
+  .stages-container {
+    grid-template-columns: 1fr;
+  }
+}
+
+.close-button:hover {
+  background-color: var(--background);
+}
+header {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 1rem;
+      box-shadow: var(--shadow);
+      margin-bottom: 2rem;
+      text-align: center;
+    }
+
+ </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>Patient Journey - Alzeimehr Desiase</h1>
+    </div>
+    <div class="visualization-container">
+      <div id="sankey_multiple" class="w-full h-[500px]"></div>
+      <div class="stages-container">
+        <div class="stage-card" data-stage="1">
+          <h3>Diagnosis and Initial Engagement</h3>
+        </div>
+        <div class="stage-card" data-stage="2">
+          <h3>Treatment pathways and Health care interactions</h3>
+        </div>
+        <div class="stage-card" data-stage="3">
+          <h3>Compliance, Adherence, Patient Support</h3>
+        </div>
+        <div class="stage-card" data-stage="4">
+          <h3>Outcomes, Evaluation and Economic impact</h3>
+        </div>
+        <div class="stage-card" data-stage="5">
+          <h3>Ongoing management and follow up care
+          </h3>
+        </div>
+
+        <!-- first stage -->
+        <div class="stage-insights-dropdown hidden w-full col-span-full bg-white rounded-lg shadow-lg p-6 mt-4" data-stage-content="1">
+          <div class="header-stats">
+            <div class="stat-card">
+              <h3>85%</h3>
+              <p>Initial PCP Diagnoses</p>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 85%"></div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <h3>78%</h3>
+              <p>MMSE Completion Rate</p>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 78%"></div>
+              </div>
+            </div>
+            <div class="stat-card">
+              <h3>58%</h3>
+              <p>Confirmed Diagnoses</p>
+              <div class="progress-bar">
+                <div class="progress-fill" style="width: 58%"></div>
+              </div>
+            </div>
+          </div>
+        </header>
+    
+        <div class="journey-section">
+          <div class="step-header">
+            <div class="step-number">1</div>
+            <h2 class="step-title">Primary Care Provider (PCP) Visit</h2>
+          </div>
+          <p>Initial point of contact for all patients experiencing symptoms (100% of cases)</p>
+    
+          <div class="info-box">
+            <h4>Initial Diagnosis Statistics</h4>
+            <p><span class="stat">85%</span> of adults receive initial diagnosis through PCP</p>
+            <p><span class="stat">65%</span> of older adults face initial misdiagnosis</p>
+            <p><span class="stat">25%</span> of general population face initial misdiagnosis</p>
+          </div>
+    
+          <button class="next-step-button" onclick="toggleDropdown(this)">
+            Proceed to Cognitive Screening
+            <i class="fas fa-chevron-down"></i>
+          </button>
+    
+          <div class="dropdown-content">
+            <div class="nested-section">
+              <div class="step-header">
+                <div class="step-number">2</div>
+                <h2 class="step-title">Cognitive Screening</h2>
+              </div>
+              
+              <div class="info-box">
+                <h4>Test Completion Rates</h4>
+                <p><span class="stat">78%</span> complete Mini-Mental State Exam (MMSE)</p>
+                <p><span class="stat">65%</span> complete Montreal Cognitive Assessment (MoCA)</p>
+              </div>
+    
+              <div class="barriers-box">
+                <h4><i class="fas fa-exclamation-triangle"></i> Common Testing Obstacles</h4>
+                <ul>
+                  <li>High testing costs</li>
+                  <li>Extended scheduling delays</li>
+                  <li>Limited availability of testing facilities</li>
+                </ul>
+              </div>
+    
+              <button class="next-step-button" onclick="toggleDropdown(this)">
+                Proceed to Neurologist Referral
+                <i class="fas fa-chevron-down"></i>
+              </button>
+    
+              <div class="dropdown-content">
+                <div class="nested-section">
+                  <div class="step-header">
+                    <div class="step-number">3</div>
+                    <h2 class="step-title">Neurologist Referral</h2>
+                  </div>
+    
+                  <div class="info-box">
+                    <h4>Confirmation Statistics</h4>
+                    <p><span class="stat">58%</span> receive confirmed Alzheimer's diagnosis</p>
+                    <p>Average time to confirmation: <span class="stat">3-6 months</span></p>
+                  </div>
+    
+                  <div class="barriers-box">
+                    <h4><i class="fas fa-exclamation-triangle"></i> Key Referral Barriers</h4>
+                    <ul>
+                      <li>Insurance authorization delays</li>
+                      <li>Patient hesitation and denial</li>
+                      <li>Limited specialist availability</li>
+                      <li>Coordination between PCP and specialist</li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="barriers-box">
+            <h4><i class="fas fa-exclamation-triangle"></i> Key Barriers at PCP Level</h4>
+            <ul>
+              <li>Insurance plan restrictions affect <span class="stat">15%</span> of patients</li>
+              <li>Referral delays: 1-3 months (general), 3-6 months (older adults)</li>
+              <li>Misdiagnosis as age-related decline or depression</li>
+              <li>Average time to correct diagnosis: <span class="stat">3-6 months</span></li>
+            </ul>
+          </div>
+        </div>
+    
+        </div>
+
+
+      </div>
+    </div>
+
+    
+  </div>
+
+  <div class="overlay"></div>
+  <div class="stage-insights">
+    <button class="close-button">✕</button>
+    <div class="insight-content"></div>
+  </div>
+
+  <script>
+    google.charts.load("current", { packages: ["sankey"] });
+    google.charts.setOnLoadCallback(drawChart);
+
+    document.addEventListener('DOMContentLoaded', function() {
+  const stageCards = document.querySelectorAll('.stage-card');
+  
+  stageCards.forEach(card => {
+    card.addEventListener('click', function() {
+      const stageNumber = this.getAttribute('data-stage');
+      const correspondingContent = document.querySelector(`[data-stage-content="${stageNumber}"]`);
+      
+      // Close all other dropdowns
+      document.querySelectorAll('.stage-insights-dropdown').forEach(dropdown => {
+        if (dropdown !== correspondingContent) {
+          dropdown.classList.add('hidden');
+          dropdown.classList.remove('expanded');
+        }
+      });
+      
+      // Toggle the clicked dropdown
+      if (correspondingContent) {
+        correspondingContent.classList.toggle('hidden');
+        correspondingContent.classList.toggle('expanded');
+      }
+    });
+  });
+});
+
+function drawChart() {
+  var data = new google.visualization.DataTable();
+  data.addColumn('string', 'From');
+  data.addColumn('string', 'To');
+  data.addColumn('number', 'Weight');
+  data.addColumn({ type: 'string', role: 'tooltip', p: { html: true } }); // Add a custom tooltip column
+
+  const stages = [
+    "Diagnosis and Initial Engagement",
+    "Treatment pathways and Health care interactions",
+    "Compliance, Adherence, Patient Support",
+    "Outcomes, Evaluation and Economic impact",
+    "Ongoing management and follow up care",
+  ];
+
+  const initialPatients = 100;
+  let currentPatients = initialPatients;
+  const attritionRates = [0.10, 0.15, 0.20, 0.25, 0.30];
+
+  for (let i = 0; i < stages.length - 1; i++) {
+    const remainingPatients = Math.round(currentPatients * (1 - attritionRates[i]));
+    
+    // Adding custom tooltip text
+    const tooltipText = `<div style="padding:8px; font-size:14px;"><strong>${stages[i]} to ${stages[i + 1]}</strong><br>Remaining Patients: ${remainingPatients}</div>`;
+    data.addRows([[stages[i], stages[i + 1], remainingPatients, tooltipText]]); // Include custom tooltip
+    currentPatients = remainingPatients;
+  }
+
+  var options = {
+    width: '100%',
+    height: 400,
+    sankey: {
+      node: {
+        labelPadding: 16,
+        nodePadding: 28,
+        width: 30,
+        colors: ['#93e7c7'],
+        label: {
+          fontName: 'system-ui',
+          fontSize: 14,
+          color: '#1e293b',
+          bold: false
+        }
+      },
+      link: {
+        colorMode: 'gradient',
+        colors: ['#3b82f6', '#2563eb']
+      }
+    },
+    tooltip: { isHtml: true }, 
+  };
+
+  var chart = new google.visualization.Sankey(document.getElementById('sankey_multiple'));
+  chart.draw(data, options);
+}
+
+
+
+
+    function toggleInsights(node) {
+  // Target the insights panel within the *same* treatment node
+  const insightsPanel = node.querySelector('.insights-panel');
+
+  // Toggle the clicked node's panel
+  if (insightsPanel) {
+    insightsPanel.style.display = insightsPanel.style.display === 'block' ? 'none' : 'block';
+  }
+  event.stopPropagation();
+}
+function toggleDropdown(button) {
+      const content = button.nextElementSibling;
+      const icon = button.querySelector('i');
+      
+      if (content.style.display === 'block') {
+        content.style.display = 'none';
+        icon.className = 'fas fa-chevron-down';
+      } else {
+        content.style.display = 'block';
+        icon.className = 'fas fa-chevron-up';
+      }
+    }
+
+    // Update the timestamp
+    function updateTimestamp() {
+      const now = new Date();
+      document.getElementById('updateTime').textContent = now.toLocaleString();
+    }
+
+    // Update timestamp every minute
+    updateTimestamp();
+    setInterval(updateTimestamp, 60000);
+
+    // Animate progress bars on scroll
+    function animateProgressBars() {
+      const progressBars = document.querySelectorAll('.progress-fill');
+      progressBars.forEach(bar => {
+        const rect = bar.getBoundingClientRect();
+        if (rect.top < window.innerHeight && rect.bottom > 0) {
+          bar.style.width = bar.parentElement.dataset.progress || '0%';
+        }
+      });
+    }
+
+    // Listen for scroll events
+    window.addEventListener('scroll', animateProgressBars);
+    // Initial animation
+    animateProgressBars();
+
+
+document.addEventListener('DOMContentLoaded', function() {
+  // Delegate event listener to the container
+  const flowContainer = document.querySelector('.flow-container');
+  flowContainer.addEventListener('click', function(event) {
+    const target = event.target.closest('.treatment-node');
+    if (target) {
+      toggleInsights(target);
+    }
+  });
+});
+
+    
+  </script>
 </body>
 </html>
