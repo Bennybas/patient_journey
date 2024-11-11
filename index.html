@@ -458,7 +458,7 @@ h3{
 <body>
   <div class="container">
     <div class="header">
-      <h1>Patient Journey - Alzeimehr Desiase</h1>
+      <h1>Patient Journey - Alzheimer's Disease</h1>
     </div>
     <div class="visualization-container">
       <div id="sankey_multiple" class="w-full h-[500px]"></div>
@@ -482,7 +482,9 @@ h3{
 
         <!-- first stage -->
         <div class="stage-insights-dropdown hidden w-full col-span-full bg-white rounded-lg shadow-lg p-6 mt-4" data-stage-content="1">
+          <h2><strong>Diagnosis and Initial Engagement</strong></h2>
           <div class="header-stats">
+            
             <div class="stat-card">
               <h3>85%</h3>
               <p>Initial PCP Diagnoses</p>
@@ -492,7 +494,7 @@ h3{
             </div>
             <div class="stat-card">
               <h3>78%</h3>
-              <p>MMSE Completion Rate</p>
+              <p>Cognitive Tests</p>
               <div class="progress-bar">
                 <div class="progress-fill" style="width: 78%"></div>
               </div>
@@ -717,6 +719,7 @@ h3{
 
         <!-- STage-----2 -->
         <div class="stage-insights-dropdown hidden w-full col-span-full bg-white rounded-lg shadow-lg p-6 mt-4" data-stage-content="2">
+          <h3><strong>  Treatment pathways and Health care interactions</strong></h3>
           <div class="header-stats">
             <div class="stat-card">
               <h3>68%</h3>
@@ -975,6 +978,641 @@ h3{
             </div>
           </div>
         </div>
+
+        <!-- stage 3 -->
+        <div class="stage-insights-dropdown hidden w-full col-span-full bg-white rounded-lg shadow-lg p-6 mt-4" data-stage-content="3">
+          <h3><strong>Compliance, Adherence, and Patient Support</strong></h3>
+          <div class="header-stats">
+              <div class="stat-card">
+                  <h3>66%</h3>
+                  <p>Medication Adherence</p>
+                  <div class="progress-bar">
+                      <div class="progress-fill" style="width: 66%"></div>
+                  </div>
+              </div>
+              <div class="stat-card">
+                  <h3>63%</h3>
+                  <p>Regular Follow-Up Visits</p>
+                  <div class="progress-bar">
+                      <div class="progress-fill" style="width: 63%"></div>
+                  </div>
+              </div>
+              <div class="stat-card">
+                  <h3>60%</h3>
+                  <p>Support Services Utilized</p>
+                  <div class="progress-bar">
+                      <div class="progress-fill" style="width: 60%"></div>
+                  </div>
+              </div>
+          </div>
+      
+          <div class="journey-section">
+              <div class="step-header">
+                  <div class="step-number">1</div>
+                  <h2 class="step-title">Medication Adherence Support</h2>
+              </div>
+      
+              <div class="info-section">
+                  <div class="info-cards-container">
+                      <!-- First Card -->
+                      <div class="info-card">
+                          <h4>66% adherence through reminders</h4>
+                      </div>
+      
+                      <!-- Arrow with annotations -->
+                      <div class="arrow-container">
+                          <div class="annotation-top">-3%, behavioral monitoring</div>
+                          <div class="arrow-line"></div>
+                          <div class="arrow-annotations">
+                              <div class="annotation-bottom">Timeline: 1-3 months</div>
+                          </div>
+                      </div>
+      
+                      <!-- Second Card -->
+                      <div class="info-card">
+                          <h4>63% with caregiver support</h4>
+                      </div>
+      
+                      <div class="arrow-container">
+                          <div class="annotation-top">-2%, digital tools use</div>
+                          <div class="arrow-line"></div>
+                          <div class="arrow-annotations">
+                              <div class="annotation-bottom">Timeline: Ongoing</div>
+                          </div>
+                      </div>
+      
+                      <!-- Third Card -->
+                      <div class="info-card">
+                          <h4>60% effective use of tracking apps</h4>
+                      </div>
+                  </div>
+              </div>
+      
+              <div class="barriers-box">
+                  <h3><i class="fas fa-exclamation-triangle"></i> Key Barriers in Compliance</h3>
+      
+                  <!-- Physician Characteristics -->
+                  <div class="barrier-category">
+                      <h4>Physician Care Barriers</h4>
+                      <ul>
+                          <li>Overloaded schedules limit follow-up, affecting <span class="stat">10%</span> of cases</li>
+                          <li>Lack of individualized adherence strategies</li>
+                      </ul>
+                  </div>
+      
+                  <!-- Systematic Characteristics -->
+                  <div class="barrier-category">
+                      <h4>Systematic Barriers</h4>
+                      <ul>
+                          <li>Limited access to adherence monitoring tools affects <span class="stat">5%</span> of patients</li>
+                          <li>Resource availability varies across locations</li>
+                      </ul>
+                  </div>
+              </div>
+      
+              <button class="next-step-button" onclick="toggleDropdown(this)">
+                  Proceed to Patient and Caregiver Support
+                  <i class="fas fa-chevron-down"></i>
+              </button>
+      
+              <div class="dropdown-content">
+                  <div class="nested-section">
+                      <div class="step-header">
+                          <div class="step-number">2</div>
+                          <h2 class="step-title">Patient and Caregiver Support</h2>
+                      </div>
+      
+                      <div class="info-section">
+                          <div class="info-cards-container">
+                              <!-- First Card -->
+                              <div class="info-card">
+                                  <h4>63% engaged in support groups</h4>
+                              </div>
+      
+                              <!-- Arrow with annotations -->
+                              <div class="arrow-container">
+                                  <div class="annotation-top">-4%, depression/anxiety management</div>
+                                  <div class="arrow-line"></div>
+                                  <div class="arrow-annotations">
+                                      <div class="annotation-bottom">Timeline: 1-6 months</div>
+                                  </div>
+                              </div>
+      
+                              <!-- Second Card -->
+                              <div class="info-card">
+                                  <h4>60% participate in educational sessions</h4>
+                              </div>
+      
+                              <div class="arrow-container">
+                                  <div class="annotation-top">-3%, ongoing skill-building</div>
+                                  <div class="arrow-line"></div>
+                                  <div class="arrow-annotations">
+                                      <div class="annotation-bottom">Timeline: Ongoing</div>
+                                  </div>
+                              </div>
+      
+                              <!-- Third card -->
+                              <div class="info-card">
+                                  <h4>58% access respite care</h4>
+                              </div>
+                          </div>
+                      </div>
+      
+                      <div class="barriers-box">
+                          <h3><i class="fas fa-exclamation-triangle"></i> Key Barriers in Patient Support</h3>
+      
+                          <!-- Physician Characteristics -->
+                          <div class="barrier-category">
+                              <h4>Physician Care Barriers</h4>
+                              <ul>
+                                  <li>Lack of caregiver training resources reduces support uptake <span class="stat">8%</span></li>
+                              </ul>
+                          </div>
+      
+                          <!-- Systematic Characteristics -->
+                          <div class="barrier-category">
+                              <h4>Systematic Barriers</h4>
+                              <ul>
+                                  <li>Insurance limitations on support services affect <span class="stat">3%</span></li>
+                              </ul>
+                          </div>
+                          <div class="barrier-category">
+                              <h4>Patient Characteristics</h4>
+                              <ul>
+                                  <li>Denial of care needs delays participation <span class="stat">2%</span></li>
+                              </ul>
+                          </div>
+                      </div>
+      
+                      <button class="next-step-button" onclick="toggleDropdown(this)">
+                          Proceed to Stage 4
+                          <i class="fas fa-chevron-down"></i>
+                      </button>
+                  </div>
+              </div>
+          </div>
+      </div>
+
+      <!-- STage 4 -->
+      <div class="stage-insights-dropdown hidden w-full col-span-full bg-white rounded-lg shadow-lg p-6 mt-4" data-stage-content="4">
+        <h3><strong>Outcomes, Evaluation, and Economic Impact</strong></h3>
+        <div class="header-stats">
+            <div class="stat-card">
+                <h3>62%</h3>
+                <p>Quality of Life Assessment</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 62%"></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>58%</h3>
+                <p>Cognitive Function Evaluation</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 58%"></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>55%</h3>
+                <p>Healthcare Cost Analysis</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 55%"></div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="journey-section">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <h2 class="step-title">Quality of Life and Functional Assessment</h2>
+            </div>
+    
+            <div class="info-section">
+                <div class="info-cards-container">
+                    <!-- First Card -->
+                    <div class="info-card">
+                        <h4>62% track daily function improvements</h4>
+                    </div>
+    
+                    <!-- Arrow with annotations -->
+                    <div class="arrow-container">
+                        <div class="annotation-top">-3%, mobility changes</div>
+                        <div class="arrow-line"></div>
+                        <div class="arrow-annotations">
+                            <div class="annotation-bottom">Timeline: Ongoing</div>
+                        </div>
+                    </div>
+    
+                    <!-- Second Card -->
+                    <div class="info-card">
+                        <h4>60% assess caregiver burden</h4>
+                    </div>
+    
+                    <div class="arrow-container">
+                        <div class="annotation-top">-2%, emotional impacts</div>
+                        <div class="arrow-line"></div>
+                        <div class="arrow-annotations">
+                            <div class="annotation-bottom">Timeline: Every 6 months</div>
+                        </div>
+                    </div>
+    
+                    <!-- Third Card -->
+                    <div class="info-card">
+                        <h4>58% evaluate ADLs (Activities of Daily Living)</h4>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="barriers-box">
+                <h3><i class="fas fa-exclamation-triangle"></i> Key Barriers in Quality Assessment</h3>
+    
+                <!-- Physician Characteristics -->
+                <div class="barrier-category">
+                    <h4>Physician Care Barriers</h4>
+                    <ul>
+                        <li>Limited time for detailed assessment impacts <span class="stat">8%</span> of evaluations</li>
+                    </ul>
+                </div>
+    
+                <!-- Systematic Characteristics -->
+                <div class="barrier-category">
+                    <h4>Systematic Barriers</h4>
+                    <ul>
+                        <li>Resource constraints on evaluation tools affect <span class="stat">5%</span> of patients</li>
+                    </ul>
+                </div>
+            </div>
+    
+            <button class="next-step-button" onclick="toggleDropdown(this)">
+                Proceed to Cognitive Function Evaluation
+                <i class="fas fa-chevron-down"></i>
+            </button>
+    
+            <div class="dropdown-content">
+                <div class="nested-section">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <h2 class="step-title">Cognitive Function Evaluation</h2>
+                    </div>
+    
+                    <div class="info-section">
+                        <div class="info-cards-container">
+                            <!-- First Card -->
+                            <div class="info-card">
+                                <h4>58% cognitive decline tracking</h4>
+                            </div>
+    
+                            <!-- Arrow with annotations -->
+                            <div class="arrow-container">
+                                <div class="annotation-top">-4%, behavioral analysis</div>
+                                <div class="arrow-line"></div>
+                                <div class="arrow-annotations">
+                                    <div class="annotation-bottom">Timeline: Every 3-6 months</div>
+                                </div>
+                            </div>
+    
+                            <!-- Second Card -->
+                            <div class="info-card">
+                                <h4>55% follow-up with neuropsychological tests</h4>
+                            </div>
+    
+                            <div class="arrow-container">
+                                <div class="annotation-top">-3%, tailored evaluations</div>
+                                <div class="arrow-line"></div>
+                                <div class="arrow-annotations">
+                                    <div class="annotation-bottom">Timeline: Annually</div>
+                                </div>
+                            </div>
+    
+                            <!-- Third Card -->
+                            <div class="info-card">
+                                <h4>52% MRI or PET scan follow-ups</h4>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="barriers-box">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Key Barriers in Cognitive Evaluation</h3>
+    
+                        <!-- Physician Characteristics -->
+                        <div class="barrier-category">
+                            <h4>Physician Care Barriers</h4>
+                            <ul>
+                                <li>Insufficient time to conduct extensive testing affects <span class="stat">7%</span> of patients</li>
+                            </ul>
+                        </div>
+    
+                        <!-- Systematic Characteristics -->
+                        <div class="barrier-category">
+                            <h4>Systematic Barriers</h4>
+                            <ul>
+                                <li>Access to specialized scans is limited for <span class="stat">6%</span> of patients</li>
+                            </ul>
+                        </div>
+                    </div>
+    
+                    <button class="next-step-button" onclick="toggleDropdown(this)">
+                        Proceed to Healthcare Cost and Economic Impact Analysis
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+    
+                    <div class="dropdown-content">
+                        <div class="nested-section">
+                            <div class="step-header">
+                                <div class="step-number">3</div>
+                                <h2 class="step-title">Healthcare Cost and Economic Impact Analysis</h2>
+                            </div>
+    
+                            <div class="info-section">
+                                <div class="info-cards-container">
+                                    <!-- First Card -->
+                                    <div class="info-card">
+                                        <h4>55% track out-of-pocket costs</h4>
+                                    </div>
+    
+                                    <!-- Arrow with annotations -->
+                                    <div class="arrow-container">
+                                        <div class="annotation-top">-3% due to inflation</div>
+                                        <div class="arrow-line"></div>
+                                        <div class="arrow-annotations">
+                                            <div class="annotation-bottom">Timeline: Quarterly</div>
+                                        </div>
+                                    </div>
+    
+                                    <!-- Second Card -->
+                                    <div class="info-card">
+                                        <h4>52% monitor indirect costs (caregiver time)</h4>
+                                    </div>
+    
+                                    <div class="arrow-container">
+                                        <div class="annotation-top">-2%, impacts on employment</div>
+                                        <div class="arrow-line"></div>
+                                        <div class="arrow-annotations">
+                                            <div class="annotation-bottom">Timeline: Annually</div>
+                                        </div>
+                                    </div>
+    
+                                    <!-- Third Card -->
+                                    <div class="info-card">
+                                        <h4>50% analyze long-term care needs</h4>
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <div class="barriers-box">
+                                <h3><i class="fas fa-exclamation-triangle"></i> Key Barriers in Cost Analysis</h3>
+    
+                                <!-- Systematic Characteristics -->
+                                <div class="barrier-category">
+                                    <h4>Systematic Barriers</h4>
+                                    <ul>
+                                        <li>Insurance and reimbursement gaps affect <span class="stat">5%</span> of patients</li>
+                                        <li>Financial burden due to uncovered care needs</li>
+                                    </ul>
+                                </div>
+                                <div class="barrier-category">
+                                    <h4>Patient Characteristics</h4>
+                                    <ul>
+                                        <li>Out-of-pocket costs unaffordable for <span class="stat">3%</span></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+      </div>
+
+      <!-- Stage 5 -->
+
+      <div class="stage-insights-dropdown hidden w-full col-span-full bg-white rounded-lg shadow-lg p-6 mt-4" data-stage-content="5">
+        <h3><strong>Ongoing Management and Follow-Up Care</strong></h3>
+        <div class="header-stats">
+            <div class="stat-card">
+                <h3>55%</h3>
+                <p>Regular Monitoring of Symptoms</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 55%"></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>52%</h3>
+                <p>Caregiver Training and Support</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 52%"></div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <h3>50%</h3>
+                <p>Psychosocial Interventions</p>
+                <div class="progress-bar">
+                    <div class="progress-fill" style="width: 50%"></div>
+                </div>
+            </div>
+        </div>
+    
+        <div class="journey-section">
+            <div class="step-header">
+                <div class="step-number">1</div>
+                <h2 class="step-title">Symptom Monitoring and Medication Adjustments</h2>
+            </div>
+    
+            <div class="info-section">
+                <div class="info-cards-container">
+                    <!-- First Card -->
+                    <div class="info-card">
+                        <h4>55% engage in regular check-ups for symptom changes</h4>
+                    </div>
+    
+                    <!-- Arrow with annotations -->
+                    <div class="arrow-container">
+                        <div class="annotation-top">-3%, adjustments based on decline</div>
+                        <div class="arrow-line"></div>
+                        <div class="arrow-annotations">
+                            <div class="annotation-bottom">Timeline: Every 3-6 months</div>
+                        </div>
+                    </div>
+    
+                    <!-- Second Card -->
+                    <div class="info-card">
+                        <h4>52% involve primary caregivers in feedback</h4>
+                    </div>
+    
+                    <div class="arrow-container">
+                        <div class="annotation-top">-2%, caregiver-reported observations</div>
+                        <div class="arrow-line"></div>
+                        <div class="arrow-annotations">
+                            <div class="annotation-bottom">Timeline: Monthly</div>
+                        </div>
+                    </div>
+    
+                    <!-- Third Card -->
+                    <div class="info-card">
+                        <h4>50% adjust medication as symptoms evolve</h4>
+                    </div>
+                </div>
+            </div>
+    
+            <div class="barriers-box">
+                <h3><i class="fas fa-exclamation-triangle"></i> Key Barriers in Symptom Monitoring</h3>
+    
+                <!-- Physician Characteristics -->
+                <div class="barrier-category">
+                    <h4>Physician Care Barriers</h4>
+                    <ul>
+                        <li>Lack of consistent follow-up reduces treatment effectiveness by <span class="stat">5%</span></li>
+                    </ul>
+                </div>
+    
+                <!-- Systematic Characteristics -->
+                <div class="barrier-category">
+                    <h4>Systematic Barriers</h4>
+                    <ul>
+                        <li>Resource limitations affect <span class="stat">4%</span> of scheduled follow-ups</li>
+                    </ul>
+                </div>
+            </div>
+    
+            <button class="next-step-button" onclick="toggleDropdown(this)">
+                Proceed to Caregiver Training and Support
+                <i class="fas fa-chevron-down"></i>
+            </button>
+    
+            <div class="dropdown-content">
+                <div class="nested-section">
+                    <div class="step-header">
+                        <div class="step-number">2</div>
+                        <h2 class="step-title">Caregiver Training and Support</h2>
+                    </div>
+    
+                    <div class="info-section">
+                        <div class="info-cards-container">
+                            <!-- First Card -->
+                            <div class="info-card">
+                                <h4>52% of caregivers receive training in symptom management</h4>
+                            </div>
+    
+                            <!-- Arrow with annotations -->
+                            <div class="arrow-container">
+                                <div class="annotation-top">-3%, emotional support techniques</div>
+                                <div class="arrow-line"></div>
+                                <div class="arrow-annotations">
+                                    <div class="annotation-bottom">Timeline: Initial & periodic</div>
+                                </div>
+                            </div>
+    
+                            <!-- Second Card -->
+                            <div class="info-card">
+                                <h4>50% participate in caregiver support groups</h4>
+                            </div>
+    
+                            <div class="arrow-container">
+                                <div class="annotation-top">-2%, focus on self-care</div>
+                                <div class="arrow-line"></div>
+                                <div class="arrow-annotations">
+                                    <div class="annotation-bottom">Timeline: Monthly</div>
+                                </div>
+                            </div>
+    
+                            <!-- Third Card -->
+                            <div class="info-card">
+                                <h4>48% report reduced caregiver burden</h4>
+                            </div>
+                        </div>
+                    </div>
+    
+                    <div class="barriers-box">
+                        <h3><i class="fas fa-exclamation-triangle"></i> Key Barriers in Caregiver Support</h3>
+    
+                        <!-- Systematic Characteristics -->
+                        <div class="barrier-category">
+                            <h4>Systematic Barriers</h4>
+                            <ul>
+                                <li>Lack of local resources impacts <span class="stat">4%</span> of caregiver support options</li>
+                            </ul>
+                        </div>
+                        <div class="barrier-category">
+                            <h4>Patient Characteristics</h4>
+                            <ul>
+                                <li>Reluctance to accept external help seen in <span class="stat">3%</span> of patients</li>
+                            </ul>
+                        </div>
+                    </div>
+    
+                    <button class="next-step-button" onclick="toggleDropdown(this)">
+                        Proceed to Psychosocial and Lifestyle Interventions
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+    
+                    <div class="dropdown-content">
+                        <div class="nested-section">
+                            <div class="step-header">
+                                <div class="step-number">3</div>
+                                <h2 class="step-title">Psychosocial and Lifestyle Interventions</h2>
+                            </div>
+    
+                            <div class="info-section">
+                                <div class="info-cards-container">
+                                    <!-- First Card -->
+                                    <div class="info-card">
+                                        <h4>50% use psychosocial interventions (cognitive exercises)</h4>
+                                    </div>
+    
+                                    <!-- Arrow with annotations -->
+                                    <div class="arrow-container">
+                                        <div class="annotation-top">-3% due to limited engagement</div>
+                                        <div class="arrow-line"></div>
+                                        <div class="arrow-annotations">
+                                            <div class="annotation-bottom">Timeline: Weekly</div>
+                                        </div>
+                                    </div>
+    
+                                    <!-- Second Card -->
+                                    <div class="info-card">
+                                        <h4>48% adopt regular physical activities</h4>
+                                    </div>
+    
+                                    <div class="arrow-container">
+                                        <div class="annotation-top">-2%, physical limitations</div>
+                                        <div class="arrow-line"></div>
+                                        <div class="arrow-annotations">
+                                            <div class="annotation-bottom">Timeline: 2-3 times per week</div>
+                                        </div>
+                                    </div>
+    
+                                    <!-- Third Card -->
+                                    <div class="info-card">
+                                        <h4>45% benefit from social engagement activities</h4>
+                                    </div>
+                                </div>
+                            </div>
+    
+                            <div class="barriers-box">
+                                <h3><i class="fas fa-exclamation-triangle"></i> Key Barriers in Psychosocial and Lifestyle Interventions</h3>
+    
+                                <!-- Systematic Characteristics -->
+                                <div class="barrier-category">
+                                    <h4>Systematic Barriers</h4>
+                                    <ul>
+                                        <li>Access to structured programs is limited for <span class="stat">3%</span> of patients</li>
+                                    </ul>
+                                </div>
+                                <div class="barrier-category">
+                                    <h4>Patient Characteristics</h4>
+                                    <ul>
+                                        <li>Motivation for engagement is low in <span class="stat">2%</span> of cases</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    
+      
     
       </div>
 
