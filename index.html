@@ -75,11 +75,105 @@
     }
 
     #sankey_multiple {
-  width: 100%;
+  width: 85%;
   height: 500px;
   display: block;
+  position: relative;
 }
+#sankey_multiple text {
+            display: none !important;
+        }
+        
 
+        .overlay-text-1 {
+          width: 200px;
+      position: absolute;
+      top: 350px;
+      left: 180px;
+      transform: translateX(-50%);
+      font-size: 10px;
+      font-weight: bold;
+      color: #333;
+      background-color: #daf9f8;
+      cursor: pointer;
+      padding: 10px 20px;
+      border-radius: 8px;
+      pointer-events: none;
+      z-index: 1;
+      display: flex;
+      
+    }
+    .overlay-text-2 {
+      width: 200px;
+      position: absolute;
+      top: 350px;
+      left: 420px;
+      transform: translateX(-50%);
+      font-size: 10px;
+      font-weight: bold;
+      color: #333;
+      background-color: #daf9f8;
+      padding: 10px 20px;
+      border-radius: 8px;
+      pointer-events: none;
+      z-index: 1;
+      display: flex;
+     
+    }
+    .overlay-text-3 {
+      width: 200px;
+      position: absolute;
+      top: 350px;
+      left: 660px;
+      transform: translateX(-50%);
+      font-size: 10px;
+      font-weight: bold;
+      color: #333;
+      background-color: #daf9f8;
+      padding: 10px 20px;
+      border-radius: 8px;
+      pointer-events: none;
+      z-index: 1;
+      display: flex;
+    }
+    .overlay-text-4 {
+      width: 200px;
+      position: absolute;
+      top: 350px;
+      right: 162px;
+      transform: translateX(-50%);
+      font-size: 10px;
+      font-weight: bold;
+      color: #333;
+      background-color: #daf9f8;
+      padding: 10px 20px;
+      border-radius: 8px;
+      pointer-events: none;
+      z-index: 1;
+      display: flex;
+    }
+    .overlay-text-5 {
+      width: 200px;
+      position: absolute;
+      top: 350px;
+      right: -80px;
+      transform: translateX(-50%);
+      font-size: 10px;
+      font-weight: bold;
+      color: #333;
+      background-color: #daf9f8;
+      padding: 10px 20px;
+      border-radius: 8px;
+      pointer-events: none;
+      z-index: 1;
+      display: flex;
+    }
+    .overlay-text-5:hover,.overlay-text-4:hover,
+    .overlay-text-3:hover,.overlay-text-2:hover,.overlay-text-1:hover{
+      background-color: #8df7f3
+    }
+
+   
 
     .stages-container {
       display: grid;
@@ -461,7 +555,25 @@ h3{
       <h1>Patient Journey - Alzheimer's Disease</h1>
     </div>
     <div class="visualization-container">
-      <div id="sankey_multiple" class="w-full h-[500px]"></div>
+      <div class="overlay-text-1">
+        <span data-stage="1">Diagnosis and Initial Engagement</span>
+      </div>
+      <div class="overlay-text-2">
+        <span>Treatment pathways and Health care interactions</span>
+      </div>
+      <div class="overlay-text-3">
+        <span>Compliance, Adherence, Patient Support</span>
+      </div>
+      <div class="overlay-text-4">
+        <span>Outcomes, Evaluation and Economic impact</span>
+      </div>
+      <div class="overlay-text-5">
+        <span>Ongoing management and follow up care</span>
+      </div>
+   
+      <div id="sankey_multiple" class="w-full h-[500px]">
+
+      </div>
       <div class="stages-container">
         <div class="stage-card" data-stage="1">
           <h3>Diagnosis and Initial Engagement</h3>
@@ -1144,10 +1256,7 @@ h3{
                           </div>
                       </div>
       
-                      <button class="next-step-button" onclick="toggleDropdown(this)">
-                          Proceed to Stage 4
-                          <i class="fas fa-chevron-down"></i>
-                      </button>
+                    
                   </div>
               </div>
           </div>
@@ -1630,8 +1739,6 @@ h3{
   </div>
 
   <script>
-    google.charts.load("current", { packages: ["sankey"] });
-    google.charts.setOnLoadCallback(drawChart);
 
     document.addEventListener('DOMContentLoaded', function() {
   const stageCards = document.querySelectorAll('.stage-card');
@@ -1658,62 +1765,85 @@ h3{
   });
 });
 
-function drawChart() {
-  var data = new google.visualization.DataTable();
-  data.addColumn('string', 'From');
-  data.addColumn('string', 'To');
-  data.addColumn('number', 'Weight');
-  data.addColumn({ type: 'string', role: 'tooltip', p: { html: true } }); // Add a custom tooltip column
+google.charts.load("current", { packages: ["sankey"] });
+    google.charts.setOnLoadCallback(drawChart);
 
-  const stages = [
-    "Diagnosis and Initial Engagement",
-    "Treatment pathways and Health care interactions",
-    "Compliance, Adherence, Patient Support",
-    "Outcomes, Evaluation and Economic impact",
-    "Ongoing management and follow up care",
-  ];
+    function drawChart() {
+      var data = new google.visualization.DataTable();
+      data.addColumn('string', 'From');
+      data.addColumn('string', 'To');
+      data.addColumn('number', 'Weight');
+      data.addColumn({ type: 'string', role: 'tooltip', p: { html: true } });
 
-  const initialPatients = 100;
-  let currentPatients = initialPatients;
-  const attritionRates = [0.10, 0.15, 0.20, 0.25, 0.30];
+      const stages = [
+        "Diagnosis and Initial Engagement",
+        "Treatment pathways and Health care interactions",
+        "Compliance, Adherence, Patient Support",
+        "Outcomes, Evaluation and Economic impact",
+        "Ongoing management and follow up care",
+      ];
 
-  for (let i = 0; i < stages.length - 1; i++) {
-    const remainingPatients = Math.round(currentPatients * (1 - attritionRates[i]));
-    
-    // Adding custom tooltip text
-    const tooltipText = `<div style="padding:8px; font-size:14px;"><strong>${stages[i]} to ${stages[i + 1]}</strong><br>Remaining Patients: ${remainingPatients}</div>`;
-    data.addRows([[stages[i], stages[i + 1], remainingPatients, tooltipText]]); // Include custom tooltip
-    currentPatients = remainingPatients;
-  }
+      const initialPatients = 1000;
+      let currentPatients = initialPatients;
+      const attritionRates = [0.10, 0.15, 0.20, 0.25, 0.30];
 
-  var options = {
-    width: '100%',
-    height: 400,
-    sankey: {
-      node: {
-        labelPadding: 16,
-        nodePadding: 28,
-        width: 30,
-        colors: ['#93e7c7'],
-        label: {
-          fontName: 'system-ui',
-          fontSize: 14,
-          color: '#1e293b',
-          bold: false
-        }
-      },
-      link: {
-        colorMode: 'gradient',
-        colors: ['#3b82f6', '#2563eb']
+      for (let i = 0; i < stages.length - 1; i++) {
+        const remainingPatients = Math.round(currentPatients * (1 - attritionRates[i]));
+        const tooltipText = `<div style="padding:8px; font-size:14px;"><strong>${stages[i]} to ${stages[i + 1]}</strong><br>Remaining Patients: ${remainingPatients}</div>`;
+        data.addRows([[stages[i], stages[i + 1], remainingPatients, tooltipText]]);
+        currentPatients = remainingPatients;
       }
-    },
-    tooltip: { isHtml: true }, 
-  };
 
-  var chart = new google.visualization.Sankey(document.getElementById('sankey_multiple'));
-  chart.draw(data, options);
-}
+      var options = {
+        width: '100%',
+        height: 400,
+        sankey: {
+          node: {
+            labelPadding: 16,
+            nodePadding: 28,
+            width: 30,
+            colors: ['#93e7c7'],
+            label: {
+              fontName: 'system-ui',
+              fontSize: 14,
+              color: '#1e293b',
+              bold: false
+            }
+          },
+          link: {
+            colorMode: 'gradient',
+            colors: ['#3b82f6', '#2563eb']
+          }
+        },
+        tooltip: { isHtml: true },
+      };
 
+      var chart = new google.visualization.Sankey(document.getElementById('sankey_multiple'));
+      chart.draw(data, options);
+
+      google.visualization.events.addListener(chart, 'ready', function () {
+        const layout = chart.getChartLayoutInterface();
+
+        // Clear any existing labels
+        document.querySelectorAll('.node-label').forEach(label => label.remove());
+
+        // Add labels near each node
+        const nodes = stages;
+        nodes.forEach((node, index) => {
+          const label = document.createElement('div');
+          label.classList.add('node-label');
+          label.innerText = node;
+
+          // Get node position and set label near the node
+          const nodeBounds = layout.getBoundingBox('node#' + index);
+          if (nodeBounds) {
+            label.style.left = `${nodeBounds.left + nodeBounds.width + 20}px`; // Position to the right of the node
+            label.style.top = `${nodeBounds.top}px`; // Align with node's top position
+            document.querySelector('.visualization-container').appendChild(label);
+          }
+        });
+      });
+    }
 
 
 
